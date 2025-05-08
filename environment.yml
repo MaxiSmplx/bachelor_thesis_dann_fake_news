@@ -1,0 +1,21 @@
+name: fake-news-detection
+channels:
+  - defaults
+
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - numpy
+      - pandas
+      - scikit-learn
+      - nltk
+      - matplotlib
+      - seaborn
+      - jupyterlab
+      - ipykernel
+      - tqdm
+      - tensorflow
+      - keras
+      - datasets
+      - ipywidgets
