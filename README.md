@@ -1,1 +1,1 @@
-# bachelor_thesis_dann_fake_news
+# Bachelor Thesis - DANNs in Fake News Detection
