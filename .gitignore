@@ -1,8 +1,10 @@
+# Ignore everything in datasets/
 datasets/*
-!datasets/.gitkeep
+# Keep README.md file in datasets
+!datasets/README.md
 
 # Environment variables
 .env
 
-# Cache
+# Python cache
 __pycache__/
