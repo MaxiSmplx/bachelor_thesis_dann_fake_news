@@ -1,2 +1,8 @@
 datasets/*
 !datasets/.gitkeep
+
+# Environment variables
+.env
+
+# Cache
+__pycache__/
