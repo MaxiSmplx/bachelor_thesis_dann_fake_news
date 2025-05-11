@@ -8,3 +8,9 @@ datasets/*
 
 # Python cache
 __pycache__/
+
+# .csv files
+*.csv
+*.pkl
+*.jsonl
+*.tsv

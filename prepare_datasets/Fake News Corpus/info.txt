@@ -1,0 +1,2 @@
+The original dataset, news_cleaned_2018_02_13.csv, has size = 28GB with ~9.5mil rows.
+Hence, it is not included in the download but can be obtained here: https://github.com/several27/FakeNewsCorpus/releases/tag/v1.0
