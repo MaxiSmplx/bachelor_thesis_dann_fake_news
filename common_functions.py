@@ -66,3 +66,16 @@ def evaluate_model(y_pred, y_test):
     print()
     print("Confusion Matrix:")
     print(confusion_matrix(y_true, y_pred))
+
+
+print("detect_missing_values()")
+def detect_missing_values(df: pd.DataFrame):
+    missing_per_column = df.isna().sum()
+    total_missing = missing_per_column.sum()
+    columns_with_missing = missing_per_column[missing_per_column > 0].index.tolist()
+    
+    print("Missing values per column:")
+    print(missing_per_column)
+    print("\nTotal missing values in DataFrame:", total_missing)
+    print("\nColumns with missing values:", columns_with_missing)
+
