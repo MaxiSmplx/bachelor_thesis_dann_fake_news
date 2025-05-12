@@ -6,8 +6,8 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from datasets import load_dataset, concatenate_datasets, Dataset
 from random import randint
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     classification_report,
     accuracy_score,
@@ -18,54 +18,53 @@ from sklearn.metrics import (
 )
 
 
-print("load_dataset()")
-def load_dataset(dataset_path: str) -> Dataset: 
-    real_data = load_dataset("csv", data_files="../datasets/FakeNewsDetection/fakenewsdetection_real.csv")["train"]
-    real_data = real_data.add_column("label", [0] * len(real_data))
+print("read_dataset()")
+def read_dataset(dataset_path: str) -> pd.DataFrame: 
+    real_data = pd.read_csv(f"{dataset_path}/real.csv")
+    fake_data = pd.read_csv(f"{dataset_path}/fake.csv")
 
-    fake_data = load_dataset("csv", data_files="../datasets/FakeNewsDetection/fakenewsdetection_fake.csv")["train"]
-    fake_data = fake_data.add_column("label", [1] * len(fake_data))
-
-    return concatenate_datasets([real_data, fake_data])
+    return pd.concat([real_data, fake_data], ignore_index=True)
 
 
 print("combine_text_columns()")
-def combine_text_columns(dataset:Dataset, cols:list[str]) -> Dataset:
-    def combine(data):
-        return {
-            "combined_text": " ".join(str(data[col]) for col in cols if data.get(col) is not None)
-        }
-    dataset = dataset.map(combine)
-    dataset = dataset.remove_columns(cols)
-    return dataset
+def combine_text_columns(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    df["combined_text"] = df[cols].apply(
+        lambda row: " ".join(str(val) for val in row if pd.notnull(val)),
+        axis=1
+    )
+    df.drop(columns=cols, inplace=True)
+    return df
+
 
 
 print("split_data()")
-def split_data(dataset:Dataset, split_size:int = 0.2) -> (Dataset, Dataset):
-    dataset = dataset.shuffle(seed=randint(0, 1_000_000))
-    dataset = dataset.train_test_split(test_size=split_size)
-
-    return dataset["train"], dataset["test"]
+def split_data(df: pd.DataFrame, split_size: float = 0.2) -> tuple[pd.DataFrame, pd.DataFrame]:
+    random_seed = randint(0, 1_000_000)
+    train_df, test_df = train_test_split(df, test_size=split_size, random_state=random_seed, shuffle=True)
+    return train_df, test_df
 
 
 print("extract_data()")
-def extract_data(train_data:Dataset, test_data:Dataset, text_col:str = "combined_text", label_col:str = "label"):
-    return train_data[text_col], train_data[label_col], test_data[text_col], test_data[label_col]
+def extract_data(train_df: pd.DataFrame, test_df: pd.DataFrame, text_col: str = "combined_text", label_col: str = "label"):
+    return (
+        train_df[text_col], train_df[label_col],
+        test_df[text_col], test_df[label_col]
+    )
 
 
 print("evaluate_model()")
-def evaluate_model(y_pred, y_test):
+def evaluate_model(y_test, y_pred):
     print("Classification Report:")
-    print(classification_report(y_true, y_pred))
+    print(classification_report(y_test, y_pred))
     print()
     print("Overall Metrics:")
-    print(f"Accuracy       : {accuracy_score(y_true, y_pred):.4f}")
-    print(f"Precision (avg): {precision_score(y_true, y_pred, average='weighted', zero_division=0):.4f}")
-    print(f"Recall    (avg): {recall_score(y_true, y_pred, average='weighted', zero_division=0):.4f}")
-    print(f"F1 Score  (avg): {f1_score(y_true, y_pred, average='weighted', zero_division=0):.4f}")
+    print(f"Accuracy       : {accuracy_score(y_test, y_pred):.4f}")
+    print(f"Precision (avg): {precision_score(y_test, y_pred, average='weighted', zero_division=0):.4f}")
+    print(f"Recall    (avg): {recall_score(y_test, y_pred, average='weighted', zero_division=0):.4f}")
+    print(f"F1 Score  (avg): {f1_score(y_test, y_pred, average='weighted', zero_division=0):.4f}")
     print()
     print("Confusion Matrix:")
-    print(confusion_matrix(y_true, y_pred))
+    print(confusion_matrix(y_test, y_pred))
 
 
 print("detect_missing_values()")
