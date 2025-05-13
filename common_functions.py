@@ -4,8 +4,6 @@
 
 #Libraries
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from random import randint
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
@@ -16,6 +14,8 @@ from sklearn.metrics import (
     f1_score,
     confusion_matrix
 )
+from constants import DATASETS
+
 
 
 print("read_dataset()")
@@ -24,6 +24,20 @@ def read_dataset(dataset_path: str) -> pd.DataFrame:
     fake_data = pd.read_csv(f"{dataset_path}/fake.csv")
 
     return pd.concat([real_data, fake_data], ignore_index=True)
+
+
+print("read_all_datasets()")
+def read_all_datasets() -> pd.DataFrame:
+    path = "datasets"
+
+    all_dfs = [
+        pd.read_csv(f"{path}/{data}/{type}.csv")
+        for data in DATASETS
+        for type in ("real", "fake")
+    ]
+
+    return pd.concat(all_dfs, ignore_index=True)
+    
 
 
 print("combine_text_columns()")

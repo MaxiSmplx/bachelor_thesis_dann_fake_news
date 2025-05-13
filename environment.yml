@@ -24,3 +24,4 @@ dependencies:
       - openai
       - python-dotenv
       - openpyxl
+      - gdown
