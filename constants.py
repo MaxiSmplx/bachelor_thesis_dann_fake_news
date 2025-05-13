@@ -5,7 +5,7 @@ DATASETS = [
     "Fakeddit",
     "FEVER",
     "FineFake",
-    "ISO Fake News",
+    "ISOT Fake News",
     "LIAR2",
     "llm-misinformation",
     "Source based FN",
@@ -20,7 +20,7 @@ GOOGLE_DRIVE_IDS_RAW = {
     "Fakeddit": "16ZW_oaTL3k9Igd20Yt_CyezotKkkb_6I",
     "FEVER": "1ggT5n4G7fI84trKlcW8grzzQUX2Sj582",
     "FineFake": "1Z86KZ00KUfdCr-l3T9w6-pD880wKnaua",
-    "ISO Fake News": "1KcuRj6VIPLFQrW3yNc-mFqhIK24EZumL",
+    "ISOT Fake News": "1KcuRj6VIPLFQrW3yNc-mFqhIK24EZumL",
     "LIAR2": "1fO6RQngKVejGUS9xzhSfnMsBlDhx27ot",
     "llm-misinformation": "1wMj6hR9qiDa6_lYelf7N-XmWQnp4hvpD",
     "Source based FN": "1pVPcfZFCturLdLdNEEW7HoL04FdB0dmE",
@@ -53,8 +53,8 @@ METADATA = {
         "domain": "",
         "raw_type" : "csv"
     },
-    "ISO Fake News": {
-        "name": "ISO Fake News",
+    "ISOT Fake News": {
+        "name": "ISOT Fake News",
         "columns" : ["title", "text", "label"],
         "domain": "",
         "raw_type" : "csv"
