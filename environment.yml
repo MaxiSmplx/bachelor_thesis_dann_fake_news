@@ -25,3 +25,4 @@ dependencies:
       - python-dotenv
       - openpyxl
       - gdown
+      - nlpaug

@@ -19,19 +19,19 @@ from constants import DATASETS
 
 
 print("read_dataset()")
-def read_dataset(dataset_path: str) -> pd.DataFrame: 
-    real_data = pd.read_csv(f"{dataset_path}/real.csv")
-    fake_data = pd.read_csv(f"{dataset_path}/fake.csv")
+def read_dataset(dataset_name: str) -> pd.DataFrame: 
+    real_data = pd.read_parquet(f"../datasets/{dataset_name}/real.parquet")
+    fake_data = pd.read_parquet(f"../datasets/{dataset_name}/fake.parquet")
 
     return pd.concat([real_data, fake_data], ignore_index=True)
 
 
 print("read_all_datasets()")
 def read_all_datasets() -> pd.DataFrame:
-    path = "datasets"
+    path = "../datasets"
 
     all_dfs = [
-        pd.read_csv(f"{path}/{data}/{type}.csv")
+        pd.read_parquet(f"{path}/{data}/{type}.parquet")
         for data in DATASETS
         for type in ("real", "fake")
     ]
@@ -42,11 +42,11 @@ def read_all_datasets() -> pd.DataFrame:
 
 print("combine_text_columns()")
 def combine_text_columns(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
-    df["combined_text"] = df[cols].apply(
+    df["text"] = df[cols].apply(
         lambda row: " ".join(str(val) for val in row if pd.notnull(val)),
         axis=1
     )
-    df.drop(columns=cols, inplace=True)
+    df.drop(columns=filter(lambda c: c != "text", cols), inplace=True)
     return df
 
 
