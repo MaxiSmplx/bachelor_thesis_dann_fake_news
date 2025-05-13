@@ -21,4 +21,6 @@ dependencies:
       - ipywidgets
       - Unidecode
       - transformers
+      - openai
+      - python-dotenv
       - openpyxl
