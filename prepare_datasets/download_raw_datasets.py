@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from constants import DATASETS, GOOGLE_DRIVE_IDS_RAW, METADATA
+from constants import DATASETS, GOOGLE_DRIVE_IDS_RAW
 
 
 def download_drive_file(file_id: str, output_path: str) -> None:
@@ -17,7 +17,7 @@ def download_drive_file(file_id: str, output_path: str) -> None:
 def get_all_raw_files() -> None:
     for folder in DATASETS:
         print(f"\n📁Downloading Dataset -> {folder}")
-        download_drive_file(GOOGLE_DRIVE_IDS_RAW[folder], f"prepare_datasets/{folder}/{folder}.{METADATA[folder]['raw_type']}")
+        download_drive_file(GOOGLE_DRIVE_IDS_RAW[folder], f"prepare_datasets/{folder}/{folder}.parquet")
 
 
 if __name__ == "__main__":
