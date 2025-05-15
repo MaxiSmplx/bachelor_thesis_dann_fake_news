@@ -23,7 +23,7 @@ The architecture incorporates **Multi-Domain Learning** and **Adversarial Invari
 ## 🧠 Core Contributions
 
 - Implementation of a **Domain-Adversarial Neural Network (DANN)** with a Gradient Reversal Layer (GRL)
-- Benchmarking against **SVM, Naive Bayes, Random Forest, CNN**, and **LLMs (Transformer-based models)**
+- Benchmarking against **SVM, Naive Bayes, Logistic Regression, CNN**, and **LLMs (Transformer-based models)**
 - Integration of **domain-specific data** from various public datasets
 - Usage of **data augmentation** and **robustness techniques** (dropout, adversarial training, noise injection)
 - Performance evaluation across metrics: Accuracy, Precision, Recall, F1-score, False Positive Rate, and more
@@ -32,30 +32,23 @@ The architecture incorporates **Multi-Domain Learning** and **Adversarial Invari
 
 ## 📊 Datasets Used
 
-### ✅ Training Datasets
+### 🚂 Training Datasets
 
 | Dataset | Domain | Type | Size |
 |--------|--------|------|------|
-| FakeNewsNet (PolitiFact) | Politics | News Article | 14,000 |
-| CONSTRAINT-21 COVID | Healthcare | Social Media | 10,700 |
-| WELFake | General News | News Article | 72,100 |
-| Fakeddit | General News | Social Media | >1,000,000 |
-| LIAR2 | Politics | Journalistic Statements | 23,000 |
-| Fake News Detection (Kaggle) | Politics | News Article | 45,000 |
-| LLMFake | Mixed | News Article | 90,000 |
+
+TODO
 
 ### 🧪 Test Datasets
 
 | Dataset | Domain | Type | Size |
 |--------|--------|------|------|
-| FakeNewsNet (GossipCop) | Entertainment | News Article | 19,000 |
-| BuzzFeed Political News | Politics | News Article | 1,700 |
-| COVID-Lies | Healthcare | Social Media | 6,600 |
-| Climate-FEVER | Climate | Statements | 1,500 |
-| FineFake | General News | News Article | 16,900 |
+
+TODO
 
 All datasets can be found at:  
-🔗 **[<link>](<link>)**
+🔗 **[Raw Datasets](https://drive.google.com/drive/folders/1d_2XZ3N9c1Nmncj1CSrnQAaUaoG_xkyv?usp=share_link)** \
+🔗 **[Processed Datasets](https://drive.google.com/drive/folders/1-uSCjx6wC7Rh-6gJ1MC0rUFKoF1chw42?usp=share_link)**
 
 ---
 
