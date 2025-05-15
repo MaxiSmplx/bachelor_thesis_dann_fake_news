@@ -16,7 +16,7 @@ def download_drive_file(file_id: str, output_path: str) -> None:
 
 def get_all_raw_files() -> None:
     for dataset in GOOGLE_DRIVE_IDS_RAW:
-        print(f"\n📁Downloading Dataset -> {dataset}")
+        print(f"\n📁 Downloading Dataset -> {dataset}")
         download_drive_file(GOOGLE_DRIVE_IDS_RAW[dataset], f"prepare_datasets/{dataset}/{dataset}.parquet")
 
 
