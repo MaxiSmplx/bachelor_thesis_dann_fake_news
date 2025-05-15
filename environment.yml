@@ -26,3 +26,4 @@ dependencies:
       - openpyxl
       - gdown
       - nlpaug
+      - PyYAML

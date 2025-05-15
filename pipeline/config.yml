@@ -1,0 +1,25 @@
+datasets_root: "../datasets"
+
+preprocessing:
+  lowercase: true
+  remove_punctuation: true
+  remove_urls: true
+  remove_digits: true
+  strip_html: true
+  remove_special_chars: true
+
+augmentation:
+  enabled: true
+  methods:
+    - synonym_replacement
+    - text_paraphrasing
+    - style_transfer
+ 
+tokenization:
+  tokenizer_model: "bert-base-uncased"
+  sequence_max_length: 256
+
+
+output:
+  processed_data_dir: "output"
+  model_save_dir: "models"
