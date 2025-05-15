@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from constants import GOOGLE_DRIVE_IDS_RAW
+from constants import DATASETS, GOOGLE_DRIVE_IDS
 
 
 def download_drive_file(file_id: str, output_path: str) -> None:
@@ -14,11 +14,13 @@ def download_drive_file(file_id: str, output_path: str) -> None:
         print(f"Dataset {os.path.basename(output_path)} already exists in corresponding folder")
 
 
-def get_all_raw_files() -> None:
-    for dataset in GOOGLE_DRIVE_IDS_RAW:
-        print(f"\n📁Downloading Dataset -> {dataset}")
-        download_drive_file(GOOGLE_DRIVE_IDS_RAW[dataset], f"prepare_datasets/{dataset}/{dataset}.parquet")
+def get_all_files() -> None:
+    for dataset_name, dataset in GOOGLE_DRIVE_IDS.items():
+        print(f"\n📁 Downloading Dataset -> {dataset_name}")
+        for type, id in dataset.items():
+            print(f"📄 Retrieving {type}.parquet")
+            download_drive_file(id, f"datasets/{dataset_name}/{type}.parquet")
 
 
 if __name__ == "__main__":
-    get_all_raw_files()
+    get_all_files()

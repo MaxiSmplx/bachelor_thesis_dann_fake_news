@@ -28,6 +28,54 @@ GOOGLE_DRIVE_IDS_RAW = {
 }
 
 
+GOOGLE_DRIVE_IDS = {
+    "Climate-FEVER": {
+        "real": "1_b0RwUh3YVwT10leIkdIk9XKl3QAa8eg",
+        "fake": "1ECNEewI9OlkWM-dv5hU1AERFqo6RGlra"
+    },
+    "Fake News Corpus": {
+        "real": "10KCEx0JEjvn42oej2ptJgH-iAUitdP4k",
+        "fake": "143JrvutfvpKQvtDzHlVHXpAeKW9KcpXA"
+    },
+    "Fake News Prediction": {
+        "real": "1a_nGHNUh7d7rpgdQYatoidHbb0EMHPId",
+        "fake": "1wmm9cokUDFzEGiQb2edUxcTubYrfhHFg"
+    },
+    "Fakeddit": {
+        "real": "1maPEbPoW9SY9h28t5zE3K-8qSsJAldl7",
+        "fake": "1o6j4D2V9oTaLcspxIx-O8_2Tz1J3FIUV"
+    },
+    "FEVER": {
+        "real": "1r3A40-CcfOc3_yG0NmDn0mu92FwraUU9",
+        "fake": "159pXTV_FIqL3AIGDHV9hAWMtpxceOAz1"
+    },
+    "FineFake": {
+        "real": "1UftWuMbZWglHEeiWZqxTzfYppEEwWwoK",
+        "fake": "1miAd7kYRKkGNu8ygDpmNwn5gtl-4hyGy"
+    },
+    "ISOT Fake News": {
+        "real": "1TP37DVPIebWZURq9cJYGJBmA0oifRw2a",
+        "fake": "1v2g1eF1twUtFAZmA2dlVpf1pn4hLZz0o"
+    },
+    "LIAR2": {
+        "real": "15MlZ7_xprEFmbhiRYKWNPkE33OCbwBaj",
+        "fake": "1lbXgL_kyFxrx3iYZnbAYjnDDRFJ3g7Zq"
+    },
+    "llm-misinformation": {
+        "real": "1KJxwCKjBMABE8I3NtnZBB-9fyopdWVLv",
+        "fake": "1MpWm4ynGnmKRaxabia3Vfu56INfOkID2"
+    },
+    "Source based FN": {
+        "real": "1Ij7Dt6AcMXfSEykuMHQtcCsfw_mE9-gn",
+        "fake": "1WszJIzt5PxAYZAaZ3B4sYlcCxNk2J_Rj"
+    },
+    "WELFake": {
+        "real": "1pFzGonPbzo8CCGSNTGtjDOTqI5l3hARg",
+        "fake": "162x2UNvEkQ56eNf6ws05gFzPzHfsDPfm"
+    }
+}
+
+
 METADATA = {
     "WELFake": {
         "name": "WELFake",
