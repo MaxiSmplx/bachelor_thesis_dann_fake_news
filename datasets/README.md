@@ -11,14 +11,14 @@ All datasets are stored in the `datasets/` directory, with each dataset housed i
 ```plaintext
 datasets/
 ├── dataset1/
-│   ├── real.csv
-│   └── fake.csv
+│   ├── real.parquet
+│   └── fake.parquet
 ├── dataset2/
-│   ├── real.csv
-│   └── fake.csv
+│   ├── real.parquet
+│   └── fake.parquet
 ├── dataset3/
-│   ├── real.csv
-│   └── fake.csv
+│   ├── real.parquet
+│   └── fake.parquet
 ...
 ```
 
@@ -28,7 +28,7 @@ datasets/
 
 To load the files in your Jupyter notebooks or Python scripts, use the following path pattern:
 
-`real_path = "../datasets/<dataset_name>/real.csv"`\
-`fake_path = "../datasets/<dataset_name>/fake.csv"`\
+`real_path = "../datasets/<dataset_name>/real.parquet"`\
+`fake_path = "../datasets/<dataset_name>/fake.parquet"`\
 \
 Or use the `load_dataset()` function in **common_functions**
