@@ -48,7 +48,9 @@ TODO
 
 All datasets can be found at:  
 🔗 **[Raw Datasets](https://drive.google.com/drive/folders/1d_2XZ3N9c1Nmncj1CSrnQAaUaoG_xkyv?usp=share_link)** \
-🔗 **[Processed Datasets](https://drive.google.com/drive/folders/1-uSCjx6wC7Rh-6gJ1MC0rUFKoF1chw42?usp=share_link)**
+🔗 **[Processed Datasets](https://drive.google.com/drive/folders/1-uSCjx6wC7Rh-6gJ1MC0rUFKoF1chw42?usp=share_link)** \
+🔗 **[Final Data](https://drive.google.com/drive/folders/1EZ1ci31e1I4LV1axNKYbe0fzqdbNky51?usp=sharing)**
+
 
 ---
 ## 📦 Get the Data
@@ -57,8 +59,10 @@ Retrieving data can be done in **4 different ways**, depending on how much contr
 
 ### 🗂️ Use the Preprocessed All-in-One File
 
-Use the fully processed, combined dataset available in **`TODO`**.  
-This is the quickest and easiest option — no setup required.
+Use the fully processed, combined dataset available in the `/pipeline` directory.  
+- Load them using: `read_processed_data()` (from `common_functions.py`)
+- Downloadable via `download_processed_data.py` in `/pipeline`.
+- This is the quickest and easiest option — no setup required.
 
 
 
@@ -90,6 +94,7 @@ Located in `/prepare_datasets` — mostly raw `.parquet` files converted from or
 Get the original datasets directly from the official sources listed above.
 
 - After downloading, run `make_dataset.ipynb` and then `process_dataset.ipynb` for full preparation.
+- Furthermore, this data should run through the processing and augmentation pipeline found in the pipeline folder
 
 
 ---
