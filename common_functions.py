@@ -4,7 +4,7 @@
 
 #Libraries
 import pandas as pd
-from random import randint
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     classification_report,
@@ -37,6 +37,15 @@ def read_all_datasets() -> pd.DataFrame:
     ]
 
     return pd.concat(all_dfs, ignore_index=True)
+
+
+print("read_processed_data()")
+def read_processed_data(augmented: bool = False):
+    path = f"../pipeline/output/preprocessed_data{'_augmented' if augmented else ''}.npz"
+
+    data = np.load(path)
+
+    return data["X"], data["y"]
     
 
 
@@ -50,19 +59,19 @@ def combine_text_columns(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return df
 
 
-
-print("split_data()")
-def split_data(df: pd.DataFrame, split_size: float = 0.2) -> tuple[pd.DataFrame, pd.DataFrame]:
-    random_seed = randint(0, 1_000_000)
-    train_df, test_df = train_test_split(df, test_size=split_size, random_state=random_seed, shuffle=True)
-    return train_df, test_df
-
-
-print("extract_data()")
-def extract_data(train_df: pd.DataFrame, test_df: pd.DataFrame, text_col: str = "combined_text", label_col: str = "label"):
-    return (
-        train_df[text_col], train_df[label_col],
-        test_df[text_col], test_df[label_col]
+print("split_train_test()")
+def split_train_test(
+    X: np.ndarray,
+    y: np.ndarray,
+    test_size: float = 0.2,
+    stratify: bool = True
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    return train_test_split(
+        X,
+        y,
+        test_size=test_size,
+        random_state=42,
+        stratify=y if stratify else None
     )
 
 
@@ -91,4 +100,3 @@ def detect_missing_values(df: pd.DataFrame):
     print(missing_per_column)
     print("\nTotal missing values in DataFrame:", total_missing)
     print("\nColumns with missing values:", columns_with_missing)
-

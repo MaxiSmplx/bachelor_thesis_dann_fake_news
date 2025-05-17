@@ -27,3 +27,7 @@ dependencies:
       - gdown
       - nlpaug
       - PyYAML
+      - torch
+      - torchvision
+      - torchaudio
+      - sentencepiece

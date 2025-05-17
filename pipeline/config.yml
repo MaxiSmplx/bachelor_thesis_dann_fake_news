@@ -7,13 +7,22 @@ preprocessing:
   remove_digits: true
   strip_html: true
   remove_special_chars: true
+  normalize_whitespace: true
 
 augmentation:
-  enabled: true
-  methods:
-    - synonym_replacement
-    - text_paraphrasing
-    - style_transfer
+  synonym_replacement:
+    enabled: false
+    n_samples: 0.01
+  style_transfer:
+    enabled: false
+    n_samples: 0.01
+  paraphrasing:
+    enabled: false
+    n_samples: 0.01
+  
+augmentation_methods:
+  local_database: false
+  llm: true
  
 tokenization:
   tokenizer_model: "bert-base-uncased"
