@@ -1,3 +1,4 @@
+# Dataset names
 DATASETS = [
     "Climate-FEVER",
     "Fake News Corpus",
@@ -13,6 +14,7 @@ DATASETS = [
 ]
 
 
+# Google Drive IDs for raw dataset files
 GOOGLE_DRIVE_IDS_RAW = {
     "Climate-FEVER": "176qfoa8JFeox_tof4bmSPjFjQyrbNBc9",
     "Fake News Corpus": "1jWCJvPtXbVAiPU81AEKdW12Uuw6H_cIO",
@@ -28,6 +30,7 @@ GOOGLE_DRIVE_IDS_RAW = {
 }
 
 
+# Google Drive IDs for slighty preprocessed datasets
 GOOGLE_DRIVE_IDS = {
     "Climate-FEVER": {
         "real": "1_b0RwUh3YVwT10leIkdIk9XKl3QAa8eg",
@@ -75,11 +78,15 @@ GOOGLE_DRIVE_IDS = {
     }
 }
 
+
+# Google Drive IDs for final processed and augmented dataset
 GOOGLE_DRIVE_FINAL_IDS = {
-    "preprocessed_data": "1VnbRgNplGF2QdVl1NM4xLOUPk_RIfL2y",
-    "preprocessed_data_augmented": "1PNjkkODXvD9CM25XROchLp2OZVEymt5Q"
+    "preprocessed_data": "", #TODO Update
+    "preprocessed_data_augmented": "" #TODO Update
 }
 
+
+# Additional information about each dataset
 METADATA = {
     "WELFake": {
         "name": "WELFake",

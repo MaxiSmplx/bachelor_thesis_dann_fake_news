@@ -21,4 +21,5 @@ def get_all_raw_files() -> None:
 
 
 if __name__ == "__main__":
+    """Download and save all raw dataset files from Google Drive."""
     get_all_raw_files()

@@ -21,4 +21,5 @@ def get_files(only_augmented: bool = False) -> None:
 
 
 if __name__ == "__main__":
+    """Download all pipeline output files from Google Drive."""
     get_files(only_augmented=False)

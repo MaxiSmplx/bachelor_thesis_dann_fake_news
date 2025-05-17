@@ -2,7 +2,7 @@
 %run ../common_functions.py
 """
 
-#Libraries
+# Libraries
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -20,6 +20,16 @@ from constants import DATASETS
 
 print("read_dataset()")
 def read_dataset(dataset_name: str) -> pd.DataFrame: 
+    """Load and concatenate the real and fake portions of the specified dataset.
+
+    Args:
+        dataset_name (str): Name of the subdirectory under "../datasets/" containing
+                            "real.parquet" and "fake.parquet".
+
+    Returns:
+        pd.DataFrame: DataFrame containing all rows from both real.parquet and fake.parquet,
+                      re-indexed consecutively.
+    """
     real_data = pd.read_parquet(f"../datasets/{dataset_name}/real.parquet")
     fake_data = pd.read_parquet(f"../datasets/{dataset_name}/fake.parquet")
 
@@ -28,6 +38,15 @@ def read_dataset(dataset_name: str) -> pd.DataFrame:
 
 print("read_all_datasets()")
 def read_all_datasets() -> pd.DataFrame:
+    """Load and concatenate the real and fake Parquet files from all datasets listed in DATASETS.
+
+    Args:
+        None
+
+    Returns:
+        pd.DataFrame: DataFrame containing all rows from real.parquet and fake.parquet
+                      across every dataset in DATASETS, re-indexed consecutively.
+    """
     path = "../datasets"
 
     all_dfs = [
@@ -41,6 +60,17 @@ def read_all_datasets() -> pd.DataFrame:
 
 print("read_processed_data()")
 def read_processed_data(augmented: bool = False):
+    """Load preprocessed (and optionally augmented) data from the pipeline output.
+
+    Args:
+        augmented (bool): If True, load the augmented dataset (`preprocessed_data_augmented.npz`);
+                          otherwise load the standard `preprocessed_data.npz`.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: 
+            X – feature array loaded from the NPZ file,
+            y – label array loaded from the NPZ file.
+    """
     path = f"../pipeline/output/preprocessed_data{'_augmented' if augmented else ''}.npz"
 
     data = np.load(path)
@@ -51,6 +81,15 @@ def read_processed_data(augmented: bool = False):
 
 print("combine_text_columns()")
 def combine_text_columns(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    """Combine multiple text columns into a single 'text' column and drop the originals.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing the columns to combine.
+        cols (list[str]): List of column names whose values will be concatenated.
+
+    Returns:
+        pd.DataFrame: The input DataFrame with a new 'text' column and without the original specified columns.
+    """
     df["text"] = df[cols].apply(
         lambda row: " ".join(str(val) for val in row if pd.notnull(val)),
         axis=1
@@ -66,6 +105,18 @@ def split_train_test(
     test_size: float = 0.2,
     stratify: bool = True
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Split features and labels into train and test sets.
+
+    Args:
+        X (np.ndarray): Feature array.
+        y (np.ndarray): Label array.
+        test_size (float): Proportion of the dataset to include in the test split.
+        stratify (bool): Whether to stratify the split by labels.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: 
+            X_train, X_test, y_train, y_test arrays.
+    """
     return train_test_split(
         X,
         y,
@@ -76,7 +127,17 @@ def split_train_test(
 
 
 print("evaluate_model()")
-def evaluate_model(y_test, y_pred):
+def evaluate_model(y_test: np.ndarray, y_pred: np.ndarray) -> None:
+    """Evaluate a classifiers predictions by printing key metrics and the confusion matrix.
+
+    Args:
+        y_test (np.ndarray): True labels for the test set.
+        y_pred (np.ndarray): Predicted labels from the model.
+
+    Returns:
+        None: Prints the classification report, overall accuracy, weighted precision, recall,
+              F1 score, and the confusion matrix to stdout.
+    """
     print("Classification Report:")
     print(classification_report(y_test, y_pred))
     print()
@@ -91,7 +152,16 @@ def evaluate_model(y_test, y_pred):
 
 
 print("detect_missing_values()")
-def detect_missing_values(df: pd.DataFrame):
+def detect_missing_values(df: pd.DataFrame) -> None:
+    """Analyze and report missing values in the given DataFrame.
+
+    Args:
+        df (pd.DataFrame): DataFrame to inspect for missing values.
+
+    Returns:
+        None: Prints the count of missing values per column, the total missing count,
+              and a list of columns containing missing values.
+    """
     missing_per_column = df.isna().sum()
     total_missing = missing_per_column.sum()
     columns_with_missing = missing_per_column[missing_per_column > 0].index.tolist()

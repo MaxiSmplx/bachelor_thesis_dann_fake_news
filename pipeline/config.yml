@@ -1,5 +1,7 @@
+# Root directory for all raw datasets
 datasets_root: "../datasets"
 
+# Flags for text preprocessing steps
 preprocessing:
   lowercase: true
   remove_punctuation: true
@@ -9,6 +11,8 @@ preprocessing:
   remove_special_chars: true
   normalize_whitespace: true
 
+# Configuration of data augmentation techniques 
+# n_samples: fraction (percent) of the entire DataFrame to augment per step
 augmentation:
   synonym_replacement:
     enabled: false
@@ -20,15 +24,15 @@ augmentation:
     enabled: false
     n_samples: 0.01
   
+# Selection of augmentation method sources
 augmentation_methods:
   local_database: false
   llm: true
- 
+
+# Settings for text tokenization
 tokenization:
   tokenizer_model: "bert-base-uncased"
   sequence_max_length: 256
 
-
-output:
-  processed_data_dir: "output"
-  model_save_dir: "models"
+# Directory for saving processed data
+output: "output" 

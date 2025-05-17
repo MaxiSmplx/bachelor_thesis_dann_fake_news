@@ -23,4 +23,5 @@ def get_all_files() -> None:
 
 
 if __name__ == "__main__":
+    """Download and save all real and fake dataset files from Google Drive."""
     get_all_files()
