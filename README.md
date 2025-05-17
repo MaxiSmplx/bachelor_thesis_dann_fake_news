@@ -60,6 +60,7 @@ Retrieving data can be done in **4 different ways**, depending on how much contr
 ### 🗂️ Use the Preprocessed All-in-One File
 
 Use the fully processed, combined dataset available in the `/pipeline` directory.  
+- The file has been either processed directly or additionally augmented before processing.
 - Load them using: `read_processed_data()` (from `common_functions.py`)
 - Downloadable via `download_processed_data.py` in `/pipeline`.
 - This is the quickest and easiest option — no setup required.
