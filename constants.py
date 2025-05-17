@@ -75,6 +75,10 @@ GOOGLE_DRIVE_IDS = {
     }
 }
 
+GOOGLE_DRIVE_FINAL_IDS = {
+    "preprocessed_data": "1VnbRgNplGF2QdVl1NM4xLOUPk_RIfL2y",
+    "preprocessed_data_augmented": "1PNjkkODXvD9CM25XROchLp2OZVEymt5Q"
+}
 
 METADATA = {
     "WELFake": {

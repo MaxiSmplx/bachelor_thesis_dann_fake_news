@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from constants import DATASETS, GOOGLE_DRIVE_IDS
+from constants import GOOGLE_DRIVE_IDS
 
 
 def download_drive_file(file_id: str, output_path: str) -> None:
