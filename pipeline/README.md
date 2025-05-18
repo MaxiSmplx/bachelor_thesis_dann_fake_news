@@ -1,6 +1,6 @@
 # 🧪 NLP Processing Pipeline
 
-This folder contains the complete NLP data processing pipeline, including text preprocessing, tokenization, feature extraction, and optional data augmentation. The entire flow is orchestrated by a central `pipeline.py` script and is fully configurable via a `config.yml` file.
+This folder contains the complete NLP data processing pipeline, including text preprocessing, and optional data augmentation. The entire flow is orchestrated by a central `pipeline.py` script and is fully configurable via a `config.yml` file.
 
 ---
 
@@ -22,19 +22,6 @@ Each step can be toggled via the `config.yml` file.
 
 ---
 
-### ✏️ Tokenization
-
-Text is tokenized into individual units (e.g., words or subwords) as part of the pipeline to prepare for feature extraction.
-
----
-
-### 🧠 Feature Extraction
-
-The Feature Extraction leverages a transformer model (e.g., BERT) from the Hugging Face Transformers library to extract dense vector embeddings from text. \
-This step transforms raw text into high-dimensional numeric representations that are well-suited for downstream machine learning tasks.
-
-
----
 
 ### 🔁 Optional: Data Augmentation
 
