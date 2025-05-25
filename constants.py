@@ -2,11 +2,10 @@
 DATASETS = [
     "Climate-FEVER",
     "Fake News Corpus",
-    "Fake News Prediction",
     "Fakeddit",
+    "FakeNewsNet",
     "FEVER",
     "FineFake",
-    "ISOT Fake News",
     "LIAR2",
     "llm-misinformation",
     "Source based FN",
@@ -18,17 +17,15 @@ DATASETS = [
 GOOGLE_DRIVE_IDS_RAW = {
     "Climate-FEVER": "176qfoa8JFeox_tof4bmSPjFjQyrbNBc9",
     "Fake News Corpus": "1jWCJvPtXbVAiPU81AEKdW12Uuw6H_cIO",
-    "Fake News Prediction": "1R9mnhhPQE62-pTdPaY29MyOpP7B0ZxOK",
     "Fakeddit": "12KOJ5IEGPL7tqmsbl3txYq6yD4btekHW",
+    "FakeNewsNet": "1HO7Pv0ZaWKhovF7AdqPYIyezFlmXdTTb",
     "FEVER": "1qi_uRSOjXcfuEbaO_wDRCk5Yw6aLWk1y",
     "FineFake": "1W2ks1xrlBy1wyj4Qa_Shlq3s9p02ktLR",
-    "ISOT Fake News": "14BZ3Fi0S7M362fxGQHZ4mYGGlwcnr9wf",
     "LIAR2": "1vLfuOj1aBDBlfwEgDZvPck7w-TTD0eis",
     "llm-misinformation": "16rJ9dQqGAGyqF8T4aP52ViwnQmn1qUcf",
     "Source based FN": "1zqS7AyzHVA8XrZIkKoNeJlpSKSD026MP",
     "WELFake": "1FjwRjhqZyQLorAtO_k03G13efwMlmsmP"
 }
-
 
 # Google Drive IDs for slighty preprocessed datasets
 GOOGLE_DRIVE_IDS = {
@@ -40,13 +37,13 @@ GOOGLE_DRIVE_IDS = {
         "real": "10KCEx0JEjvn42oej2ptJgH-iAUitdP4k",
         "fake": "143JrvutfvpKQvtDzHlVHXpAeKW9KcpXA"
     },
-    "Fake News Prediction": {
-        "real": "1a_nGHNUh7d7rpgdQYatoidHbb0EMHPId",
-        "fake": "1wmm9cokUDFzEGiQb2edUxcTubYrfhHFg"
-    },
     "Fakeddit": {
         "real": "1maPEbPoW9SY9h28t5zE3K-8qSsJAldl7",
         "fake": "1o6j4D2V9oTaLcspxIx-O8_2Tz1J3FIUV"
+    },
+    "FakeNewsNet": {
+        "real": "1A9WFJIfDVnfwHXjUXyadbET97tzKnMg_",
+        "fake": "1GIoopNM0GlHbA14G55KdOBg7EVD97-c3"
     },
     "FEVER": {
         "real": "1r3A40-CcfOc3_yG0NmDn0mu92FwraUU9",
@@ -55,10 +52,6 @@ GOOGLE_DRIVE_IDS = {
     "FineFake": {
         "real": "1UftWuMbZWglHEeiWZqxTzfYppEEwWwoK",
         "fake": "1miAd7kYRKkGNu8ygDpmNwn5gtl-4hyGy"
-    },
-    "ISOT Fake News": {
-        "real": "1TP37DVPIebWZURq9cJYGJBmA0oifRw2a",
-        "fake": "1v2g1eF1twUtFAZmA2dlVpf1pn4hLZz0o"
     },
     "LIAR2": {
         "real": "15MlZ7_xprEFmbhiRYKWNPkE33OCbwBaj",
@@ -108,11 +101,6 @@ METADATA = {
         "columns" : ["id", "label", "statement", "speaker"],
         "domain": "",
     },
-    "ISOT Fake News": {
-        "name": "ISOT Fake News",
-        "columns" : ["title", "text", "label"],
-        "domain": "",
-        },
     "FineFake": {
         "name": "FineFake",
         "columns" : ["text", "label"],
@@ -126,11 +114,6 @@ METADATA = {
     "Fakeddit": {
         "name": "Fakeddit",
         "columns" : ["title", "label"],
-        "domain": "",
-    },
-    "Fake News Prediction": {
-        "name": "Fake News Prediction",
-        "columns" : ["title", "text", "label"],
         "domain": "",
     },
     "Fake News Corpus": {
