@@ -8,6 +8,7 @@ DATASETS = [
     "FineFake",
     "LIAR2",
     "llm-misinformation",
+    "MultiFC",
     "Source based FN",
     "WELFake"
 ]
@@ -23,6 +24,7 @@ GOOGLE_DRIVE_IDS_RAW = {
     "FineFake": "1W2ks1xrlBy1wyj4Qa_Shlq3s9p02ktLR",
     "LIAR2": "1vLfuOj1aBDBlfwEgDZvPck7w-TTD0eis",
     "llm-misinformation": "16rJ9dQqGAGyqF8T4aP52ViwnQmn1qUcf",
+    "MultiFC": "1nJE9OlpcaWEXkwKH5Mp2UJ_bZWt2OHJC",
     "Source based FN": "1zqS7AyzHVA8XrZIkKoNeJlpSKSD026MP",
     "WELFake": "1FjwRjhqZyQLorAtO_k03G13efwMlmsmP"
 }
@@ -60,6 +62,10 @@ GOOGLE_DRIVE_IDS = {
     "llm-misinformation": {
         "real": "1KJxwCKjBMABE8I3NtnZBB-9fyopdWVLv",
         "fake": "1MpWm4ynGnmKRaxabia3Vfu56INfOkID2"
+    },
+    "MultiFC": {
+        "real": "1spVOSpfin3ZTXHh5lbGf9xlWD4EV-yDi",
+        "fake": "1pEvHfxsvt3-c3fgJIqc5GL_e9X5jGMHI"
     },
     "Source based FN": {
         "real": "1Ij7Dt6AcMXfSEykuMHQtcCsfw_mE9-gn",
