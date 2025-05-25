@@ -32,3 +32,5 @@ dependencies:
       - torchaudio
       - torchtext
       - sentencepiece
+      - sentence-transformers
+      - tf-keras
