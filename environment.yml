@@ -30,4 +30,5 @@ dependencies:
       - torch
       - torchvision
       - torchaudio
+      - torchtext
       - sentencepiece
