@@ -71,11 +71,9 @@ def read_processed_data(augmented: bool = False):
             X – feature array loaded from the NPZ file,
             y – label array loaded from the NPZ file.
     """
-    path = f"../pipeline/output/preprocessed_data{'_augmented' if augmented else ''}.npz"
+    path = f"../pipeline/output/preprocessed_data{'_augmented' if augmented else ''}.parquet"
 
-    data = np.load(path)
-
-    return data["X"], data["y"]
+    return pd.read_parquet(path)
     
 
 
@@ -100,30 +98,59 @@ def combine_text_columns(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 
 print("split_train_test()")
 def split_train_test(
-    X: np.ndarray,
-    y: np.ndarray,
+    data: pd.DataFrame,
     test_size: float = 0.2,
-    stratify: bool = True
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Split features and labels into train and test sets.
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Split DataFrame into training and testing subsets.
 
     Args:
-        X (np.ndarray): Feature array.
-        y (np.ndarray): Label array.
-        test_size (float): Proportion of the dataset to include in the test split.
-        stratify (bool): Whether to stratify the split by labels.
+        data (pd.DataFrame):  
+            The full dataset to split, as a pandas DataFrame.
+        test_size (float, optional):  
+            Fraction of samples to allocate to the test set (between 0.0 and 1.0).  
+            Defaults to 0.2 (20% test / 80% train).
 
     Returns:
-        tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]: 
-            X_train, X_test, y_train, y_test arrays.
+        Tuple[np.ndarray, np.ndarray]:  
+            - train_set: A NumPy array containing the training portion of `data`.  
+            - test_set: A NumPy array containing the testing portion of `data`.
     """
     return train_test_split(
-        X,
-        y,
+        data,
         test_size=test_size,
         random_state=42,
-        stratify=y if stratify else None
     )
+
+print("extract_data()")
+def extract_data(
+    train_df: pd.DataFrame,
+    test_df: pd.DataFrame,
+    text_col: str,
+    label_col: str
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Extract feature and label arrays from train and test DataFrames.
+
+    Args:
+        train_df (pd.DataFrame): DataFrame containing the training data.
+        test_df (pd.DataFrame): DataFrame containing the test data.
+        text_col (str):     Name of the column to use as the feature.
+        label_col (str):    Name of the column to use as the label.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+            X_train: numpy array of features from train_df
+            y_train: numpy array of labels from train_df
+            X_test:  numpy array of features from test_df
+            y_test:  numpy array of labels from test_df
+    """
+    X_train = train_df[text_col].to_numpy()
+    y_train = train_df[label_col].to_numpy()
+    X_test  = test_df[text_col].to_numpy()
+    y_test  = test_df[label_col].to_numpy()
+
+    return X_train, y_train, X_test, y_test
 
 
 print("evaluate_model()")
