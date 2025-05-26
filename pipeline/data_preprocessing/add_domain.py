@@ -8,7 +8,7 @@ from sklearn.cluster import MiniBatchKMeans
 import pandas as pd
 import numpy as np
 
-def sentence_encoding(df: pd.DataFrame) -> np.ndarray:
+def sentence_encoding(df: pd.DataFrame, save_to_file: bool) -> np.ndarray:
     model = SentenceTransformer("all-MiniLM-L6-v2")   
     
     embeddings = model.encode(
@@ -18,9 +18,12 @@ def sentence_encoding(df: pd.DataFrame) -> np.ndarray:
         convert_to_numpy=True
     )
 
+    if save_to_file:
+        np.save("output/embeddings.npy", embeddings)
+
     return embeddings
 
-def kMeans(k: int = 12): #TODO Tweak parameters and check if it works better
+def kMeans(k: int = 13): #TODO Tweak parameters and check if it works better
     kmeans = MiniBatchKMeans(
         n_clusters=k,
         batch_size=1024,
@@ -48,18 +51,22 @@ def ids_to_topic(samples: dict[int: list[str]]) -> str:
 
 
 
-def add_domain(df: pd.DataFrame) -> pd.DataFrame:
-    print("Computing sentence embeddings...")
-    embeddings = sentence_encoding(df)
+def add_domain(df: pd.DataFrame, save_embeddings: bool = False, use_saved_embeddings: bool = False) -> pd.DataFrame:
+    if use_saved_embeddings and os.path.exists("output/embeddings.npy"):
+        print("Reading saved sentence embeddings...")
+        embeddings = np.load("output/embeddings.npy")
+    else:
+        print("Computing sentence embeddings...")
+        embeddings = sentence_encoding(df, save_embeddings)
 
-    k = 12
+    k = 13
     print(f"Initializing KMeans with k={k} Clusters...")
     kmeans = kMeans(k=k)
 
     print("Predicting domains with KMeans...")
     df["domain"] = kmeans.fit_predict(embeddings)
 
-    n_samples = 8
+    n_samples = 6
     samples = {
         cid: (
             df[df["domain"] == cid]
@@ -73,6 +80,8 @@ def add_domain(df: pd.DataFrame) -> pd.DataFrame:
 
     print("Mapping domain IDs to topic names...")
     df["domain"] = df["domain"].map(ids_to_topic(samples))
+
+    print(f"\n\nTopic Distribution: {df['domain'].value_counts()}")
 
     return df
 

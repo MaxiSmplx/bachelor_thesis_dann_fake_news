@@ -11,6 +11,10 @@ preprocessing:
   remove_special_chars: true
   normalize_whitespace: true
 
+domain_tagging:
+  save_embeddings: true
+  use_saved_embeddings: true
+
 # Configuration of data augmentation techniques 
 # n_samples: fraction (percent) of the entire DataFrame to augment per step
 augmentation:

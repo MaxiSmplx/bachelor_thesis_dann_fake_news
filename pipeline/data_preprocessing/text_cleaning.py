@@ -1,6 +1,9 @@
 import re
 import string
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
+import warnings
+
+warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
 def remove_html(text: str) -> str:
     return BeautifulSoup(text, "html.parser").get_text()

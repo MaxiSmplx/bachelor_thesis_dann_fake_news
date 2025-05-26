@@ -14,29 +14,28 @@ def print_stats(data: pd.DataFrame) -> None:
         f"({dup_pct:.2f}% of total)"
     )
 
+    return total_rows, unique_texts
+
 
 def duplicates_single(datasets: dict[str: pd.DataFrame]) -> dict[str: pd.DataFrame]:
-    print("==DUPLICATES WITHIN DATASET==")
+    print("\n\n==DUPLICATES WITHIN DATASET==")
     total_duplicates_single = 0
 
     for name, df in datasets.items():
         # count
         duplicate_count = len(df) - df["text"].nunique()
         total_duplicates_single += duplicate_count
-        print(f"Found {duplicate_count} duplicated rows for Dataset '{name}'")
         
         # remove
         old_length = len(df)
         df.drop_duplicates(subset=["text"], inplace=True)
-        print(f"Row count: {old_length} → {len(df)} "
-            f"(-{((old_length - len(df)) / old_length * 100):.2f}%)")
-        print("=" * 50)
+        print(f"  • {name}: {duplicate_count} duplicates removed, rows {old_length}→{len(df)} (-{((old_length - len(df)) / old_length * 100):.2f}%)")
 
     print(f"=> Found {total_duplicates_single} duplicated rows in total")
 
 
 def duplicates_across(datasets: dict[str: pd.DataFrame]) -> dict[str: pd.DataFrame]:
-    print("==DUPLICATES ACROSS DATASETS==")
+    print("\n\n==DUPLICATES ACROSS DATASETS==")
     text_sets = {name: set(df['text']) for name, df in datasets.items()}
     total_duplicates_across = 0
 
@@ -45,8 +44,7 @@ def duplicates_across(datasets: dict[str: pd.DataFrame]) -> dict[str: pd.DataFra
         if len(common_texts) > 0:
             # count
             total_duplicates_across += len(common_texts)
-            print(f"Found {len(common_texts)} duplicates between '{name1}' and '{name2}' → {(len(common_texts) / len(datasets[name1])) * 100:.2f}%")
-
+            print(f"  • {name1} & {name2}: {len(common_texts)} overlaps ({(len(common_texts) / len(datasets[name1])) * 100:.2f}% of {name1})")
             # remove
             df1 = datasets[name1]
             datasets[name1] = df1[~df1['text'].isin(common_texts)]
@@ -55,9 +53,7 @@ def duplicates_across(datasets: dict[str: pd.DataFrame]) -> dict[str: pd.DataFra
 
 def find_and_remove_dups(data: pd.DataFrame, datasets: dict[str: pd.DataFrame]) -> pd.DataFrame:
     print_stats(data)
-    print()
     duplicates_single(datasets)
-    print()
     duplicates_across(datasets)
     
     return pd.concat(datasets.values(), ignore_index=True)
