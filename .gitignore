@@ -12,3 +12,4 @@ __pycache__/
 *.parquet
 *.npz
 *.npy
+*.pt

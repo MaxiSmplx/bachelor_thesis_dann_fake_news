@@ -7,6 +7,7 @@ from config import INPUT_DIM, NUM_CLASSES, NUM_DOMAINS, LEARNING_RATE, NUM_EPOCH
 from model import DANN
 from data_loader import get_dataloader
 from datetime import datetime
+from time import perf_counter
 
 def grl_lambda(iter_num: int, max_iter: int) -> float:
     p = float(iter_num) / max_iter
@@ -24,6 +25,7 @@ def train(
 
     # Device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device >> {device}")
 
     # Data Loader
     num_classes = NUM_CLASSES
@@ -43,6 +45,9 @@ def train(
         num_domains=num_domains
     ).to(device)
 
+    model_name_prefix = f"dann_{datetime.now().strftime('%Y-%m-%d-%H')}"
+    logging_dir = f"{LOG_DIR}/logs_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
+
     # Losses & optimizer
     class_criterion  = nn.CrossEntropyLoss()
     domain_criterion = nn.CrossEntropyLoss()
@@ -59,8 +64,10 @@ def train(
             os.mkdir(LOG_DIR)
 
     best_acc = 0.0
+    best_model_path = None
 
     for epoch in range(1, num_epochs + 1):
+        start_epoch_time = perf_counter()
         print(f"\n── Epoch {epoch}/{num_epochs} ──")
 
         model.train()
@@ -70,9 +77,15 @@ def train(
         total = 0
 
         for batch_idx, batch in enumerate(loader):
+            start_batch_time = perf_counter()
             print(f"  → Processing batch {batch_idx+1}/{len(loader)}")
 
             input_ids, attention_mask, y_lab, y_dom = batch
+
+            input_ids = input_ids.to(device)
+            attention_mask = attention_mask.to(device)
+            y_lab = y_lab.to(device)
+            y_dom = y_dom.to(device)
 
             x = (input_ids, attention_mask)
 
@@ -109,17 +122,27 @@ def train(
 
             print(f"     Accuracy: {batch_acc*100:.2f}%")
 
+            elapsed_time_batch = (perf_counter() - start_batch_time)
+            print(f"     Time elapsed for batch: {elapsed_time_batch:.0f}sec | "
+                  f"Time to finish epoch: {((len(loader) - (batch_idx+1)) * (elapsed_time_batch / 60)):.1f}min")
+
         avg_c_loss = running_class_loss / len(loader)
         avg_d_loss = running_domain_loss / len(loader)
         acc = correct / total * 100
 
-        print(f"[Epoch {epoch:2d}/{num_epochs}] "
-              f"ClassLoss: {avg_c_loss:.4f}  "
-              f"DomLoss: {avg_d_loss:.4f}  "
-              f"Acc: {acc:.2f}%")
+        elapsed_time_epoch = (perf_counter() - start_epoch_time) / 60
+            
+
+        print(f"🎯 [Epoch {epoch:2d}/{num_epochs}] ➔ "
+              f"Class-Loss: {avg_c_loss:.4f}  "
+              f"Domain-Loss: {avg_d_loss:.4f}  "
+              f"Accuracy: {acc:.2f}%"
+              f"Time elapsed for epoch: {elapsed_time_epoch:.1f}min | "
+              f"Time to finish run: {((num_epochs - epoch) * (elapsed_time_epoch) / 60):.2f}hrs")
+
 
         if logging:
-            with open(f"{LOG_DIR}/logs_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt", "a") as f:
+            with open(logging_dir, "a") as f:
                 f.write(f"[Epoch {epoch:2d}/{num_epochs}]\n"
                         f"  ‣ Class-Loss: {avg_c_loss:.4f}\n"
                         f"  ‣ Domain-Loss: {avg_d_loss:.4f}\n"
@@ -128,13 +151,16 @@ def train(
         # save if its the best model
         if acc > best_acc:
             best_acc = acc
-            model_name = f"dann_{datetime.now().strftime('%Y-%m-%d-%H')}_acc-{acc:.2f}"
-            ckpt_path = os.path.join(save_dir, f"{model_name}.pt")
-            torch.save(model.state_dict(), ckpt_path)
+            if best_model_path and os.path.isfile(best_model_path):
+                os.remove(best_model_path)
 
-            print(f"Saved checkpoint: {ckpt_path}")
+            model_name = f"{model_name_prefix}_acc-{acc:.2f}"
+            best_model_path = os.path.join(save_dir, f"{model_name}.pt")
+            torch.save(model.state_dict(), best_model_path)
+
+            print(f"Saved checkpoint: {best_model_path}")
 
     print("Training complete.")
 
 if __name__ == "__main__":
-    train()
+    train(logging=True)
