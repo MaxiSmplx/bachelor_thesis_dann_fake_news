@@ -2,7 +2,8 @@ import os
 import numpy as np
 import torch
 from torch import nn, optim
-from config import INPUT_DIM, NUM_CLASSES, NUM_DOMAINS, LEARNING_RATE, NUM_EPOCHS, CHECKPOINT_DIR, FEATURE_DIM
+from adan_pytorch import Adan
+from config import INPUT_DIM, NUM_CLASSES, NUM_DOMAINS, LEARNING_RATE, NUM_EPOCHS, CHECKPOINT_DIR, FEATURE_DIM, LOG_DIR
 from model import DANN
 from data_loader import get_dataloader
 from datetime import datetime
@@ -20,7 +21,8 @@ def train(
     feature_dim: int = FEATURE_DIM,
     lr: float = LEARNING_RATE,
     num_epochs: int = NUM_EPOCHS,
-    save_dir: str = CHECKPOINT_DIR
+    save_dir: str = CHECKPOINT_DIR,
+    logging: bool = False
 ):
     print("🚀 Starting training run...")
 
@@ -48,7 +50,7 @@ def train(
     # Losses & optimizer
     class_criterion  = nn.CrossEntropyLoss()
     domain_criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = Adan(model.parameters(), lr=lr, weight_decay=5e-4)
 
     # Training loop
     total_iters = num_epochs * len(loader)
@@ -56,6 +58,9 @@ def train(
 
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
+    if logging:
+        if not os.path.isdir(LOG_DIR):
+            os.mkdir(LOG_DIR)
 
     best_acc = 0.0
 
@@ -91,7 +96,6 @@ def train(
 
             print(f"     Class-Loss: {loss_class.item():.4f} | Domain-Loss: {loss_domain.item():.4f}")
 
-
             # backward + step
             optimizer.zero_grad()
             loss.backward()
@@ -117,6 +121,13 @@ def train(
               f"ClassLoss: {avg_c_loss:.4f}  "
               f"DomLoss: {avg_d_loss:.4f}  "
               f"Acc: {acc:.2f}%")
+
+        if logging:
+            with open(f"{LOG_DIR}/logs_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt", "a") as f:
+                f.write(f"[Epoch {epoch:2d}/{num_epochs}]\n"
+                        f"  ‣ Class-Loss: {avg_c_loss:.4f}\n"
+                        f"  ‣ Domain-Loss: {avg_d_loss:.4f}\n"
+                        f"  ‣ Accuracy: {acc:.2f}% \n\n")
 
         # save if its the best model
         if acc > best_acc:

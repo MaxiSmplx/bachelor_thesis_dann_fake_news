@@ -7,6 +7,8 @@ from data_augmentation._openai_api import call_openai
 from sklearn.cluster import MiniBatchKMeans
 import pandas as pd
 import numpy as np
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
 
 def sentence_encoding(df: pd.DataFrame, save_to_file: bool) -> np.ndarray:
     model = SentenceTransformer("all-MiniLM-L6-v2")   
@@ -50,8 +52,39 @@ def ids_to_topic(samples: dict[int: list[str]]) -> str:
     return ast.literal_eval(response)
 
 
+def visualize_kmeans(kmeans, embeddings):
+    labels = kmeans.fit_predict(embeddings)
 
-def add_domain(df: pd.DataFrame, k: int, save_embeddings: bool = False, use_saved_embeddings: bool = False) -> pd.DataFrame:
+    # Convert to 2D using PCA
+    pca = PCA(n_components=2)
+    embeddings_2d = pca.fit_transform(embeddings)
+
+    # Plot clusters
+    plt.figure(figsize=(8, 6))
+    for i in range(13):
+        plt.scatter(
+            embeddings_2d[labels == i, 0],
+            embeddings_2d[labels == i, 1],
+            label=f'Cluster {i}',
+            alpha=0.6
+        )
+
+    # Plot centroids (also reduced to 2D)
+    centroids_2d = pca.transform(kmeans.cluster_centers_)
+    plt.scatter(centroids_2d[:, 0], centroids_2d[:, 1], c='black', s=200, marker='X', label='Centroids')
+
+    plt.legend()
+    plt.title('kMeans Clustering Visualization')
+    plt.xlabel('PCA Component 1')
+    plt.ylabel('PCA Component 2')
+    plt.grid(True)
+    plt.show()
+
+
+def add_domain(df: pd.DataFrame, 
+               k: int, save_embeddings: bool = False, 
+               use_saved_embeddings: bool = False, 
+               plot_kmeans: bool = False) -> pd.DataFrame:
     if use_saved_embeddings and os.path.exists("output/embeddings.npy"):
         print("Reading saved sentence embeddings...")
         embeddings = np.load("output/embeddings.npy")
@@ -64,6 +97,9 @@ def add_domain(df: pd.DataFrame, k: int, save_embeddings: bool = False, use_save
 
     print("Predicting domains with KMeans...")
     df["domain"] = kmeans.fit_predict(embeddings)
+
+    if plot_kmeans:
+        visualize_kmeans(kmeans, embeddings)
 
     n_samples = 6
     samples = {

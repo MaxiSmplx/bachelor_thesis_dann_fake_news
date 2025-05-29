@@ -23,7 +23,7 @@ NUM_DOMAINS = config["domain_tagging"]["n_domains"]
 
 # Training Hyperparameters
 LEARNING_RATE = 1e-4
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 NUM_EPOCHS = 20
 
 # Gradient Reversal Layer schedule
@@ -31,4 +31,5 @@ GRL_LAMBDA_MAX = 1.0
 GRL_WARMUP_EPOCHS = 1.0
 
 # Model
-CHECKPOINT_DIR = "checkpoints"
+CHECKPOINT_DIR = "models/Domain Adversarial Neural Network/checkpoints"
+LOG_DIR = "models/Domain Adversarial Neural Network/logs"
