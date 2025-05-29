@@ -122,9 +122,9 @@ def train(
 
             print(f"     Accuracy: {batch_acc*100:.2f}%")
 
-            elapsed_time_batch = (perf_counter() - start_batch_time)
+            elapsed_time_batch = (perf_counter() - start_batch_time) # TODO change to average for more robust estimate
             print(f"     Time elapsed for batch: {elapsed_time_batch:.0f}sec | "
-                  f"Time to finish epoch: {((len(loader) - (batch_idx+1)) * (elapsed_time_batch / 60)):.1f}min")
+                  f"Time to finish epoch: {((len(loader) - (batch_idx+1)) * (elapsed_time_batch / 60)):.1f}min") #TODO Beautify
 
         avg_c_loss = running_class_loss / len(loader)
         avg_d_loss = running_domain_loss / len(loader)
@@ -136,13 +136,13 @@ def train(
         print(f"🎯 [Epoch {epoch:2d}/{num_epochs}] ➔ "
               f"Class-Loss: {avg_c_loss:.4f}  "
               f"Domain-Loss: {avg_d_loss:.4f}  "
-              f"Accuracy: {acc:.2f}%"
+              f"Accuracy: {acc:.2f} \n%"
               f"Time elapsed for epoch: {elapsed_time_epoch:.1f}min | "
-              f"Time to finish run: {((num_epochs - epoch) * (elapsed_time_epoch) / 60):.2f}hrs")
+              f"Time to finish run: {((num_epochs - epoch) * (elapsed_time_epoch) / 60):.2f}hrs") #TODO Beautify
 
 
         if logging:
-            with open(logging_dir, "a") as f:
+            with open(logging_dir, "a") as f: #Doesnt work
                 f.write(f"[Epoch {epoch:2d}/{num_epochs}]\n"
                         f"  ‣ Class-Loss: {avg_c_loss:.4f}\n"
                         f"  ‣ Domain-Loss: {avg_d_loss:.4f}\n"
