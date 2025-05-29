@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-from torch import nn, optim
+from torch import nn
 from adan_pytorch import Adan
 from config import INPUT_DIM, NUM_CLASSES, NUM_DOMAINS, LEARNING_RATE, NUM_EPOCHS, CHECKPOINT_DIR, FEATURE_DIM, LOG_DIR
 from model import DANN
@@ -9,10 +9,6 @@ from data_loader import get_dataloader
 from datetime import datetime
 
 def grl_lambda(iter_num: int, max_iter: int) -> float:
-    """
-    Compute the GRL coefficient lambda_p = 2/(1+exp(-10*p)) - 1
-    where p = iter_num / max_iter.
-    """
     p = float(iter_num) / max_iter
     return 2.0 / (1.0 + np.exp(-10.0 * p)) - 1.0
 

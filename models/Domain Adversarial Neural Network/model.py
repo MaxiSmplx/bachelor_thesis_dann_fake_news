@@ -46,6 +46,7 @@ class FeatureExtractor(nn.Module):
         pooled = outputs.pooler_output
 
         features = self.feature(pooled)
+        
         return features
     
 

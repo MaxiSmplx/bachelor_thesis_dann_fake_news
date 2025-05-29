@@ -7,7 +7,7 @@ from data_augmentation._openai_api import call_openai
 from sklearn.cluster import MiniBatchKMeans
 import pandas as pd
 import numpy as np
-from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
 def sentence_encoding(df: pd.DataFrame, save_to_file: bool) -> np.ndarray:
@@ -25,7 +25,7 @@ def sentence_encoding(df: pd.DataFrame, save_to_file: bool) -> np.ndarray:
 
     return embeddings
 
-def kMeans(k: int = 13): #TODO Tweak parameters and check if it works better
+def kMeans(k: int = 13):
     kmeans = MiniBatchKMeans(
         n_clusters=k,
         batch_size=1024,
@@ -52,31 +52,32 @@ def ids_to_topic(samples: dict[int: list[str]]) -> str:
     return ast.literal_eval(response)
 
 
-def visualize_kmeans(kmeans, embeddings):
-    labels = kmeans.fit_predict(embeddings)
+def visualize_kmeans(cluster, embeddings, cluster_names, sample_size=5_000):
+    # Randomly sample to increase readability
+    if len(embeddings) > sample_size:
+        indices = np.random.choice(len(embeddings), size=sample_size, replace=False)
+        embeddings = embeddings[indices]
+        cluster = cluster[indices]
 
-    # Convert to 2D using PCA
-    pca = PCA(n_components=2)
-    embeddings_2d = pca.fit_transform(embeddings)
+    # Reduce Dimensionality to 2D
+    tsne = TSNE(n_components=2, perplexity=30, learning_rate=200, random_state=42)
+    embeddings_2d = tsne.fit_transform(embeddings)
 
     # Plot clusters
     plt.figure(figsize=(8, 6))
     for i in range(13):
         plt.scatter(
-            embeddings_2d[labels == i, 0],
-            embeddings_2d[labels == i, 1],
-            label=f'Cluster {i}',
-            alpha=0.6
+            embeddings_2d[cluster == i, 0],
+            embeddings_2d[cluster == i, 1],
+            label=f"{cluster_names.get(i)}",
+            alpha=0.6,
+            s=20
         )
 
-    # Plot centroids (also reduced to 2D)
-    centroids_2d = pca.transform(kmeans.cluster_centers_)
-    plt.scatter(centroids_2d[:, 0], centroids_2d[:, 1], c='black', s=200, marker='X', label='Centroids')
-
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.title('kMeans Clustering Visualization')
-    plt.xlabel('PCA Component 1')
-    plt.ylabel('PCA Component 2')
+    plt.xlabel('TSNE Component 1')
+    plt.ylabel('TSNE Component 2')
     plt.grid(True)
     plt.show()
 
@@ -96,10 +97,8 @@ def add_domain(df: pd.DataFrame,
     kmeans = kMeans(k=k)
 
     print("Predicting domains with KMeans...")
-    df["domain"] = kmeans.fit_predict(embeddings)
-
-    if plot_kmeans:
-        visualize_kmeans(kmeans, embeddings)
+    cluster = kmeans.fit_predict(embeddings)
+    df["domain"] = cluster
 
     n_samples = 6
     samples = {
@@ -114,7 +113,12 @@ def add_domain(df: pd.DataFrame,
     }
 
     print("Mapping domain IDs to topic names...")
-    df["domain"] = df["domain"].map(ids_to_topic(samples))
+    cluster_names = ids_to_topic(samples)
+    df["domain"] = df["domain"].map(cluster_names)
+
+    if plot_kmeans:
+        print("Plotting...")
+        visualize_kmeans(cluster, embeddings, cluster_names, sample_size=5_000)
 
     print(f"\n\nTopic Distribution: {df['domain'].value_counts()}")
 
