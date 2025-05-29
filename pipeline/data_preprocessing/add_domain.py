@@ -51,7 +51,7 @@ def ids_to_topic(samples: dict[int: list[str]]) -> str:
 
 
 
-def add_domain(df: pd.DataFrame, save_embeddings: bool = False, use_saved_embeddings: bool = False) -> pd.DataFrame:
+def add_domain(df: pd.DataFrame, k: int, save_embeddings: bool = False, use_saved_embeddings: bool = False) -> pd.DataFrame:
     if use_saved_embeddings and os.path.exists("output/embeddings.npy"):
         print("Reading saved sentence embeddings...")
         embeddings = np.load("output/embeddings.npy")
@@ -59,7 +59,6 @@ def add_domain(df: pd.DataFrame, save_embeddings: bool = False, use_saved_embedd
         print("Computing sentence embeddings...")
         embeddings = sentence_encoding(df, save_embeddings)
 
-    k = 13
     print(f"Initializing KMeans with k={k} Clusters...")
     kmeans = kMeans(k=k)
 

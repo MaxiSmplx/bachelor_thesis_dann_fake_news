@@ -5,6 +5,7 @@
 # Libraries
 import pandas as pd
 import numpy as np
+import yaml
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     classification_report,
@@ -71,7 +72,10 @@ def read_processed_data(augmented: bool = False):
             X – feature array loaded from the NPZ file,
             y – label array loaded from the NPZ file.
     """
-    path = f"../pipeline/output/preprocessed_data{'_augmented' if augmented else ''}.parquet"
+    with open("../pipeline/config.yml", "r") as f:
+        config = yaml.safe_load(f)
+
+    path = f"../pipeline/{config['output']}/preprocessed_data{'_augmented' if augmented else ''}.parquet"
 
     return pd.read_parquet(path)
     

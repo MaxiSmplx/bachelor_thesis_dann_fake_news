@@ -14,6 +14,7 @@ preprocessing:
 domain_tagging:
   save_embeddings: true
   use_saved_embeddings: true
+  n_domains: 13
 
 # Configuration of data augmentation techniques 
 # n_samples: fraction (percent) of the entire DataFrame to augment per step
