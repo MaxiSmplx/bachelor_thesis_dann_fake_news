@@ -7,7 +7,7 @@ tokenizer = TOKENIZER
 
 class ParquetDataset(Dataset):
     def __init__(self, file_path):
-        self.df = pd.read_parquet(file_path).sample(n=500) # TODO Remove just for testing
+        self.df = pd.read_parquet(file_path).sample(5_000) # TODO Remove just for testing
 
         domains = sorted(self.df['domain'].unique())
         self.domain2idx = {d:i for i,d in enumerate(domains)}

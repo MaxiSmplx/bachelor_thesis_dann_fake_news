@@ -46,7 +46,7 @@ class FeatureExtractor(nn.Module):
         pooled = outputs.pooler_output
 
         features = self.feature(pooled)
-        
+
         return features
     
 
@@ -96,4 +96,5 @@ class DANN(nn.Module):
 
         class_logits = self.label_predictor(features)
         domain_logits = self.domain_classifier(features, lambda_)
+        
         return class_logits, domain_logits

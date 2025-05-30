@@ -10,7 +10,7 @@ with open("pipeline/config.yml", "r") as f:
     config = yaml.safe_load(f)
 
 # Data Loading
-TOKENIZER_NAME = "bert-base-uncased"
+TOKENIZER_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 TOKENIZER = AutoTokenizer.from_pretrained(TOKENIZER_NAME)
 FILE_PATH = "pipeline/output/preprocessed_data.parquet"
 FILE_PATH_AUGMENTED = "pipeline/output/preprocessed_data_augmented.parquet"
@@ -23,7 +23,7 @@ NUM_DOMAINS = config["domain_tagging"]["n_domains"]
 
 # Training Hyperparameters
 LEARNING_RATE = 1e-4
-BATCH_SIZE = 64
+BATCH_SIZE = 48
 NUM_EPOCHS = 20
 
 # Gradient Reversal Layer schedule
