@@ -11,11 +11,12 @@ preprocessing:
   remove_special_chars: true
   normalize_whitespace: true
 
+# Domain tagging settings
 domain_tagging:
-  save_embeddings: true
+  save_embeddings: False
   use_saved_embeddings: true
   n_domains: 13
-  plot: false
+  plot: true
 
 # Configuration of data augmentation techniques 
 # n_samples: fraction (percent) of the entire DataFrame to augment per step
@@ -37,8 +38,11 @@ augmentation_methods:
 
 # Settings for text tokenization
 tokenization:
-  tokenizer_model: "bert-base-uncased"
+  tokenizer_model: "bert-base-uncased" #TODO change to mini model and test
   sequence_max_length: 256
+
+# Settings fo balanced output (lower data volume)
+balance_data: true
 
 # Directory for saving processed data
 output: "output" 

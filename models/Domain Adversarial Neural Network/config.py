@@ -9,11 +9,21 @@ from transformers import AutoTokenizer, AutoConfig
 with open("pipeline/config.yml", "r") as f:
     config = yaml.safe_load(f)
 
+TOKENIZERS = {
+    "MiniL6": "sentence-transformers/all-MiniLM-L6-v2",
+    "MiniL12": "sentence-transformers/all-MiniLM-L12-v2",
+    "mpnet": "sentence-transformers/all-mpnet-base-v2",
+    "roberta": "sentence-transformers/all-distilroberta-v1"
+}
+
+
 # Data Loading
-TOKENIZER_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-TOKENIZER = AutoTokenizer.from_pretrained(TOKENIZER_NAME)
+TOKENIZER_NAME = TOKENIZERS["MiniL6"]
+TOKENIZER = AutoTokenizer.from_pretrained(TOKENIZER_NAME, use_fast=True)
 FILE_PATH = "pipeline/output/preprocessed_data.parquet"
 FILE_PATH_AUGMENTED = "pipeline/output/preprocessed_data_augmented.parquet"
+FILE_PATH_BALANCED = "pipeline/output/preprocessed_data_balanced.parquet"
+FILE_PATH_AUGMENTED_BALANCED = "pipeline/output/preprocessed_data_augmented_balanced.parquet"
 
 # Model architecture
 INPUT_DIM = AutoConfig.from_pretrained(TOKENIZER_NAME).hidden_size

@@ -1,0 +1,29 @@
+import pandas as pd
+
+def balance_data(df: pd.DataFrame, tolerance: float) -> pd.DataFrame:
+    cap = int(df["domain"].value_counts().min() * (1 + tolerance))
+    print(f"Balancing every domain to approx. {cap} datapoints")
+
+    balanced_chunks = []
+    for domain, domain_count in df["domain"].value_counts().items():
+        domain_df = df[df["domain"] == domain]
+        
+        if domain_count > cap:
+            for label, label_count in domain_df["label"].value_counts().items():
+                sampled = domain_df[domain_df["label"] == label].sample(n=min(label_count, cap//2))
+                balanced_chunks.append(sampled)
+        else:
+            balanced_chunks.append(domain_df) 
+    
+    balanced_df = pd.concat(balanced_chunks, ignore_index=True).sample(frac=1).reset_index(drop=True)
+
+    count_domain_old_df = df["domain"].value_counts()
+    count_domain_new_df = balanced_df["domain"].value_counts()
+    count_label_old_df = df["label"].value_counts()
+    count_label_new_df = balanced_df["label"].value_counts()
+    
+    print(f"Max. difference in assigned rows to domain was {count_domain_old_df.max() - count_domain_old_df.min()} rows and is now {count_domain_new_df.max() - count_domain_new_df.min()} rows")
+    print(f"Label imbalance (0 vs. 1) was {count_label_old_df[0] / count_label_old_df.sum():.1%} vs. {count_label_old_df[1] / count_label_old_df.sum():.1%} "
+          f"and is now {count_label_new_df[0] / count_label_new_df.sum():.1%} vs. {count_label_new_df[1] / count_label_new_df.sum():.1%}")
+
+    return balanced_df

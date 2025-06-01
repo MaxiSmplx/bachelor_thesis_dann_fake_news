@@ -7,7 +7,7 @@ tokenizer = TOKENIZER
 
 class ParquetDataset(Dataset):
     def __init__(self, file_path):
-        self.df = pd.read_parquet(file_path).sample(5_000) # TODO Remove just for testing
+        self.df = pd.read_parquet(file_path).sample(500) # TODO Remove just for testing
 
         domains = sorted(self.df['domain'].unique())
         self.domain2idx = {d:i for i,d in enumerate(domains)}
@@ -20,7 +20,8 @@ class ParquetDataset(Dataset):
             self.texts,
             padding='max_length',
             truncation=True,
-            return_tensors='pt'
+            return_tensors='pt',
+            max_length=256,
         )
 
     def __len__(self):

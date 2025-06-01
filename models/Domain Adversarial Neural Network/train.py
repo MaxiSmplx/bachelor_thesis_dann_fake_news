@@ -2,7 +2,7 @@ import os
 import numpy as np
 import torch
 from torch import nn
-from adan_pytorch import Adan
+from torch.optim import AdamW
 from config import (
     INPUT_DIM, 
     NUM_CLASSES, 
@@ -17,7 +17,7 @@ from config import (
 )
 from model import DANN
 from data_loader import get_dataloader
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import perf_counter
 
 def grl_lambda(iter_num: int, max_iter: int) -> float:
@@ -41,11 +41,11 @@ def train(
 
     # Data Loader
     num_classes = NUM_CLASSES
-    # num_domains = NUM_DOMAINS
+    num_domains = NUM_DOMAINS
 
     loader = get_dataloader(augmented=augmented, batch_size=batch_size, shuffle=True, num_workers=4)
 
-    num_domains = len(loader.dataset.domain2idx) #TODO Remove
+    # num_domains = len(loader.dataset.domain2idx) #TODO Remove
 
     print(f"Loaded dataset with {len(loader.dataset)} datapoints... \n"
           f"    • Configured batch size: {loader.batch_size} \n"
@@ -68,7 +68,7 @@ def train(
     # Losses & optimizer
     class_criterion  = nn.CrossEntropyLoss()
     domain_criterion = nn.CrossEntropyLoss()
-    optimizer = Adan(model.parameters(), lr=lr, weight_decay=5e-4)
+    optimizer = AdamW(model.parameters(), lr=lr, weight_decay=5e-4)
 
     # Training loop
     total_iters = num_epochs * len(loader)
@@ -79,6 +79,13 @@ def train(
     if logging:
         if not os.path.isdir(LOG_DIR):
             os.mkdir(LOG_DIR)
+        with open(log_file, "a") as f:
+            f.write(f"=== Run Configuration === \n\n"
+                    f"  Tokenizer: {TOKENIZER_NAME} \n"
+                    f"  Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
+                    f"  Batch Size: {BATCH_SIZE} \n"
+                    f"  Num Epochs: {num_epochs} \n"
+                    f"  Optimizer: {optimizer.__class__.__name__} \n\n\n\n")
 
     best_acc = 0.0
     best_model_path = None
@@ -167,7 +174,8 @@ def train(
               f"Domain-Loss: {avg_d_loss:.4f} | "
               f"Accuracy: {acc:.2f}% \n"
               f"    • Epoch time: {epoch_times[-1]:.1f} min >> "
-              f"Time to finish run: {((num_epochs - epoch) * (np.mean(epoch_times)) / 60):.2f} hrs")
+              f"Time to finish run: {(eta_run := ((num_epochs - epoch) * (np.mean(epoch_times)) / 60)):.2f} hrs "
+              f"(ETA at {(datetime.now() + timedelta(hours=eta_run)).strftime('%d/%m/%Y %H:%M:%S')})")
 
 
         if logging:
