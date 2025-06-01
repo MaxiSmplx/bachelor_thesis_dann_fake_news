@@ -10,14 +10,14 @@ import numpy as np
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
-def sentence_encoding(df: pd.DataFrame, save_to_file: bool) -> np.ndarray:
-    model = SentenceTransformer("all-MiniLM-L6-v2")   
+def sentence_encoding(df: pd.DataFrame, tokenizer_model, save_to_file: bool) -> np.ndarray:
+    model = SentenceTransformer(tokenizer_model)   
     
     embeddings = model.encode(
         df["text"].tolist(),
         batch_size=256,
         show_progress_bar=True,
-        convert_to_numpy=True
+        convert_to_numpy=True,
     )
 
     if save_to_file:
@@ -83,7 +83,9 @@ def visualize_kmeans(cluster, embeddings, cluster_names, sample_size=5_000):
 
 
 def add_domain(df: pd.DataFrame, 
-               k: int, save_embeddings: bool = False, 
+               k: int, 
+               tokenizer_model,
+               save_embeddings: bool = False, 
                use_saved_embeddings: bool = False, 
                plot_kmeans: bool = False) -> pd.DataFrame:
     if use_saved_embeddings and os.path.exists("output/embeddings.npy"):
@@ -91,7 +93,7 @@ def add_domain(df: pd.DataFrame,
         embeddings = np.load("output/embeddings.npy")
     else:
         print("Computing sentence embeddings...")
-        embeddings = sentence_encoding(df, save_embeddings)
+        embeddings = sentence_encoding(df, tokenizer_model, save_embeddings)
 
     print(f"Initializing KMeans with k={k} Clusters...")
     kmeans = kMeans(k=k)

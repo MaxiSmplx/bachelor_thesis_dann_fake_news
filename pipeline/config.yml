@@ -38,7 +38,7 @@ augmentation_methods:
 
 # Settings for text tokenization
 tokenization:
-  tokenizer_model: "bert-base-uncased" #TODO change to mini model and test
+  tokenizer_model: "sentence-transformers/all-MiniLM-L6-v2"
   sequence_max_length: 256
 
 # Settings fo balanced output (lower data volume)
