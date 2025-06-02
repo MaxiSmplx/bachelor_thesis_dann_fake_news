@@ -31,7 +31,7 @@ class FeatureExtractor(nn.Module):
             nn.Linear(input_dim, 512),
             nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
+            nn.Dropout(0.25),
             nn.Linear(512, feature_dim),
             nn.BatchNorm1d(feature_dim),
             nn.ReLU(inplace=True),
@@ -71,7 +71,7 @@ class DomainClassifier(nn.Module):
             # Activation Function
             nn.ReLU(inplace=True),
             # Dropout Layer: Zeroes x% of activations during training
-            nn.Dropout(0.5),
+            nn.Dropout(0.4),
             # Fully Connected Layer
             nn.Linear(64, num_domains)
         )

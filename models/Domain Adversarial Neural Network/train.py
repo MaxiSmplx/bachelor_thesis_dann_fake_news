@@ -20,9 +20,13 @@ from data_loader import get_dataloader
 from datetime import datetime, timedelta
 from time import perf_counter
 
-def grl_lambda(iter_num: int, max_iter: int) -> float:
-    p = float(iter_num) / max_iter
-    return 2.0 / (1.0 + np.exp(-10.0 * p)) - 1.0
+def grl_lambda(iter_num: int, max_iter: int, ceiling: float = 0.5, delay: float = 0.1) -> float:
+    p = iter_num / max_iter
+    if p < delay:
+        return 0.0
+    p = (p - delay) / (1.0 - delay)
+    raw = 2.0 / (1.0 + np.exp(-10.0 * p)) - 1.0
+    return ceiling * raw
 
 def train(
     batch_size: int = BATCH_SIZE,
@@ -60,12 +64,11 @@ def train(
                                 shuffle=True,
                                 num_workers=4)
 
-
-
     print(f"Loaded Train dataset with {len(train_loader.dataset)} datapoints... \n"
           f"    • Configured batch size: {train_loader.batch_size} \n"
           f"    • {len(train_loader)} batches per epoch \n"
-          f"    • Detected {len(train_loader.dataset.df['domain'].unique())} domains \n"
+          f"    • Detected {(no_dom := len(train_loader.dataset.df['domain'].unique()))} domains \n"
+          f"        • Ideal domain accuracy: {(1/no_dom)*100:.2f}% \n"
           f"    • Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
           f"    • Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n"
           f"    • Using Tokenizer {TOKENIZER_NAME} \n"
@@ -80,12 +83,13 @@ def train(
         num_domains=num_domains
     ).to(device)
 
-    model_name_prefix = f"dann_{datetime.now().strftime('%Y-%m-%d-%H')}"
+    model_name_prefix = f"dann_{datetime.now().strftime('%Y-%m-%d-%H-%M')}"
     log_file = f"{LOG_DIR}/logs_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
 
     # Losses & optimizer
     class_criterion  = nn.CrossEntropyLoss()
     domain_criterion = nn.CrossEntropyLoss()
+
     optimizer = AdamW(model.parameters(), lr=lr, weight_decay=5e-4)
 
     # Training loop
@@ -106,8 +110,11 @@ def train(
                     f"  Num Epochs: {num_epochs} \n"
                     f"  Optimizer: {optimizer.__class__.__name__} \n\n\n\n")
 
-    best_acc = 0.0
+    best_val_acc = 0.0
     best_model_path = None
+
+    es_patience = 3
+    es_epochs_no_improve = 0
 
     epoch_times = []
 
@@ -122,12 +129,15 @@ def train(
         print(f"\n── Epoch {epoch}/{num_epochs} ──")
 
         model.train()
+
         running_class_loss = np.empty(len(train_loader))
         running_domain_loss = np.empty(len(train_loader))
         correct = 0
         total = 0
+        domain_correct = 0
+        domain_total = 0
 
-        batch_time_avg = 0
+        avg_batch_times = 0.0 
 
         for batch_idx, batch in enumerate(train_loader):
             start_batch_time = perf_counter()
@@ -167,11 +177,15 @@ def train(
             correct += (preds == y_lab).sum().item()
             total += y_lab.size(0)
 
+            domain_preds = domain_logits.argmax(dim=1)
+            domain_correct += (domain_preds == y_dom).sum().item()
+            domain_total += y_dom.size(0)
+
             batch_acc = (preds == y_lab).sum().item() / y_lab.size(0)
 
-            elapsed_time_batch = (perf_counter() - start_batch_time)
-            batch_time_avg += elapsed_time_batch
-
+            batch_time = (perf_counter() - start_batch_time)
+            avg_batch_times += batch_time
+            
             # print 5 times (+ first and last)
             if (batch_idx+1) == 1 or (batch_idx+1) % progress_treshold_train == 0 or (batch_idx + 1) == len(train_loader):
                 print(f"  → [Training] Processing batch {batch_idx+1}/{len(train_loader)}")
@@ -179,25 +193,28 @@ def train(
                 print(f"     Class-Loss: {loss_class.item():.4f} | Domain-Loss: {loss_domain.item():.4f}")
                 print(f"     Accuracy: {batch_acc*100:.2f}%")
                 print(
-                    f"     Batch time: {elapsed_time_batch:.0f} sec >> "
-                    f"Time to finish epoch: {((len(train_loader) - (batch_idx+1)) * (batch_time_avg / (batch_idx+1) / 60)):.1f} min" #TODO This doesnt account for validation times
+                    f"     Batch time: {batch_time:.1f} sec >> "
+                    f"Time to finish epoch: {((len(train_loader) - (batch_idx+1)) * (avg_batch_times / (batch_idx+1) / 60)):.1f} min"
                 )
 
         avg_c_loss = np.mean(running_class_loss)
         avg_d_loss = np.mean(running_domain_loss)
         acc = correct / total * 100
+        domain_acc = domain_correct / domain_total * 100
             
         print(f"🎯Epoch {epoch}/{num_epochs} Training Summary: "
               f"Class-Loss: {avg_c_loss:.4f} | "
               f"Domain-Loss: {avg_d_loss:.4f} | "
-              f"Accuracy: {acc:.2f}% \n")
+              f"Accuracy: {acc:.2f}% | " 
+              f"Domain Accuracy: {domain_acc:.2f}% \n")
 
 
         model.eval()
         val_class_losses = np.empty(len(val_loader))
-        val_domain_losses = np.empty(len(val_loader))
         val_correct = 0
         val_total = 0
+        domain_correct = 0
+        domain_total = 0
 
         with torch.no_grad():
             for val_batch_idx, val_batch in enumerate(val_loader):
@@ -211,44 +228,45 @@ def train(
                 x = (input_ids, attention_mask)
 
                 # For validation, freeze GRL
-                val_lambda = 1.0
-                class_logits, domain_logits = model(x, val_lambda)
+                class_logits, domain_logits = model(x, lambda_=0.0)
 
                 loss_class = class_criterion(class_logits, y_lab)
-                loss_domain = domain_criterion(domain_logits, y_dom)
                 val_class_losses[val_batch_idx] = loss_class.item()
-                val_domain_losses[val_batch_idx] = loss_domain.item()
 
                 preds = class_logits.argmax(dim=1)
                 val_correct += (preds == y_lab).sum().item()
                 val_total += y_lab.size(0)
 
+                domain_preds = domain_logits.argmax(dim=1)
+                domain_correct += (domain_preds == y_dom.to(device)).sum().item()
+                domain_total += y_dom.size(0)
+
                 batch_acc = (preds == y_lab).sum().item() / y_lab.size(0)
                 if (val_batch_idx+1) % progress_treshold_val == 0:
                     print(f"  → [Validation] Processing batch {val_batch_idx+1}/{len(val_loader)} ")
-                    print(f"     Class-Loss: {loss_class.item():.4f} | Domain-Loss: {loss_domain.item():.4f}")
+                    print(f"     Class-Loss: {loss_class.item():.4f}")
                     print(f"     Accuracy: {batch_acc*100:.2f}%")
 
         avg_val_c_loss = np.mean(val_class_losses)
-        avg_val_d_loss = np.mean(val_domain_losses)
         val_acc = val_correct / val_total * 100
+        val_domain_acc = domain_correct / domain_total * 100
 
         print(f"🔍Epoch {epoch}/{num_epochs} Validation summary: "
               f"Class-Loss: {avg_val_c_loss:.4f} | "
-              f"Domain-Loss: {avg_val_d_loss:.4f} | "
-              f"Accuracy: {val_acc:.2f}%\n")
+              f"Accuracy: {val_acc:.2f}% | "
+              f"Domain Accuracy: {val_domain_acc:.2f}%\n")
 
 
         epoch_times.append((perf_counter() - start_epoch_time) / 60)
         print(f"    • Epoch time: {epoch_times[-1]:.1f} min >> "
               f"Time to finish run: {(eta_run := ((num_epochs - epoch) * (np.mean(epoch_times)) / 60)):.2f} hrs "
-              f"(ETA at {(datetime.now() + timedelta(hours=eta_run)).strftime('%d/%m/%Y %H:%M:%S')})")
+              f"(ETA at {(datetime.now() + timedelta(hours=eta_run)).strftime('%d/%m/%Y %H:%M:%S')}) \n")
 
 
         if logging:
             with open(log_file, "a") as f:
                 f.write(f"[Epoch {epoch:2d}/{num_epochs}]\n"
-                        f"Training\n"
+                        f"‣ Training\n"
                         f"  ‣ Class-Loss: {avg_c_loss:.4f}\n"
                         f"      ‣ Max. Class-Loss: {np.max(running_class_loss):.4f}\n"
                         f"      ‣ Min. Class-Loss: {np.min(running_class_loss):.4f}\n"
@@ -256,19 +274,19 @@ def train(
                         f"      ‣ Max. Domain-Loss: {np.max(running_domain_loss):.4f}\n"
                         f"      ‣ Min. Domain-Loss: {np.min(running_domain_loss):.4f}\n"
                         f"  ‣ Accuracy: {acc:.2f}%\n"
-                        f"Validation\n"
+                        f"  ‣ Domain Accuracy: {domain_acc:.2f}% \n"
+                        f"‣ Validation\n"
                         f"  ‣ Class-Loss: {avg_val_c_loss:.4f}\n"
                         f"      ‣ Max. Class-Loss: {np.max(val_class_losses):.4f}\n"
                         f"      ‣ Min. Class-Loss: {np.min(val_class_losses):.4f}\n"
-                        f"  ‣ Domain-Loss: {avg_val_d_loss:.4f}\n"
-                        f"      ‣ Max. Domain-Loss: {np.max(val_domain_losses):.4f}\n"
-                        f"      ‣ Min. Domain-Loss: {np.min(val_domain_losses):.4f}\n"
                         f"  ‣ Accuracy: {val_acc:.2f}%\n"
                         f"  ‣ Epoch time: {epoch_times[-1]:.1f} min \n\n")
 
         # save if its the best model
-        if val_acc > best_acc:
-            best_acc = val_acc
+        if val_acc > best_val_acc + 0.1:
+            best_val_acc = val_acc
+            es_epochs_no_improve = 0
+
             if best_model_path and os.path.isfile(best_model_path):
                 os.remove(best_model_path)
 
@@ -276,10 +294,18 @@ def train(
             best_model_path = os.path.join(save_dir, f"{model_name}.pt")
             torch.save(model.state_dict(), best_model_path)
 
-            print(f"💾 Saved checkpoint: {best_model_path}")
+            print(f"💾 Saved checkpoint: {best_model_path}\n")
+        else:
+            es_epochs_no_improve += 1
+            if es_epochs_no_improve >= es_patience:
+                if logging:
+                    with open(log_file, "a") as f:
+                        f.write(f"Early stopping initiated")
+                print(f"⏹ Early stopping after {epoch} epochs (no improvement).")
+                break
 
     print("Training complete.")
 
 
 if __name__ == "__main__":
-    train(logging=True)
+    train(balanced=True, logging=True)

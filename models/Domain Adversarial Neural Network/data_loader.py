@@ -51,7 +51,7 @@ def get_dataloader(
         FILE_PATH_BALANCED if balanced else FILE_PATH
     )
 
-    data = pd.read_parquet(file_path).sample(2_500) #TODO remove
+    data = pd.read_parquet(file_path).sample(1_000) #TODO remove
 
     if split.lower() == "train" or split.lower() == "tr":
         dataset = ParquetDataset(data.sample(int((len(data) * (1 - val_fraction)))))
