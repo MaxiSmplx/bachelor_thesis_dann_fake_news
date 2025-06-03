@@ -92,4 +92,8 @@ def test_data_loader():
 
 
 if __name__ == "__main__":
-    test_epoch_print()
+    import matplotlib.pyplot as plt
+
+    plt.plot([1, 2, 3], [4, 5, 6])
+    plt.title("Simple Plot")
+    plt.show()  # Required in .py files

@@ -14,3 +14,12 @@ __pycache__/
 *.npy
 *.txt
 *.pt
+
+# Tensorboard logs
+**/tensorboard/
+
+Other logs
+**/logs/
+
+Model checkpoints
+**/checkpoints

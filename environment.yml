@@ -30,4 +30,4 @@ dependencies:
       - torchtext
       - sentence-transformers
       - tf-keras
-      - adan_pytorch
+      - tensorboard

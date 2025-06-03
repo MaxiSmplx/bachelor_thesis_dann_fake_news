@@ -3,6 +3,8 @@ import numpy as np
 import torch
 from torch import nn
 from torch.optim import AdamW
+from torch.utils.tensorboard import SummaryWriter
+from sklearn.metrics import f1_score, precision_score, recall_score
 from config import (
     INPUT_DIM, 
     NUM_CLASSES, 
@@ -12,6 +14,7 @@ from config import (
     CHECKPOINT_DIR, 
     FEATURE_DIM, 
     LOG_DIR, 
+    TENSORBOARD_DIR,
     BATCH_SIZE,
     TOKENIZER_NAME
 )
@@ -103,6 +106,9 @@ def train(
     if logging:
         if not os.path.isdir(LOG_DIR):
             os.mkdir(LOG_DIR)
+        if not os.path.isdir(TENSORBOARD_DIR):
+            os.mkdir(TENSORBOARD_DIR)
+
         with open(log_file, "a") as f:
             f.write(f"=== Run Configuration === \n\n"
                     f"  Tokenizer: {TOKENIZER_NAME} \n"
@@ -111,6 +117,8 @@ def train(
                     f"  Batch Size: {BATCH_SIZE} \n"
                     f"  Num Epochs: {num_epochs} \n"
                     f"  Optimizer: {optimizer.__class__.__name__} \n\n\n\n")
+            
+        writer = SummaryWriter(log_dir=TENSORBOARD_DIR)
 
     best_val_acc = 0.0
     best_model_path = None
@@ -215,8 +223,10 @@ def train(
         val_class_losses = np.empty(len(val_loader))
         val_correct = 0
         val_total = 0
-        domain_correct = 0
-        domain_total = 0
+        val_domain_correct = 0
+        val_domain_total = 0
+        val_all_preds = [] #TODO as numpy arrays?
+        val_all_labels = [] #TODO as numpy arrays?
 
         with torch.no_grad():
             for val_batch_idx, val_batch in enumerate(val_loader):
@@ -236,12 +246,16 @@ def train(
                 val_class_losses[val_batch_idx] = loss_class.item()
 
                 preds = class_logits.argmax(dim=1)
+
+                val_all_preds.extend(preds.cpu().numpy()) #TODO if changes from list, this needs to be extend/flattened
+                val_all_labels.extend(y_lab.cpu().numpy())
+
                 val_correct += (preds == y_lab).sum().item()
                 val_total += y_lab.size(0)
 
                 domain_preds = domain_logits.argmax(dim=1)
-                domain_correct += (domain_preds == y_dom.to(device)).sum().item()
-                domain_total += y_dom.size(0)
+                val_domain_correct += (domain_preds == y_dom.to(device)).sum().item()
+                val_domain_total += y_dom.size(0)
 
                 batch_acc = (preds == y_lab).sum().item() / y_lab.size(0)
                 if (val_batch_idx+1) % progress_treshold_val == 0:
@@ -251,7 +265,11 @@ def train(
 
         avg_val_c_loss = np.mean(val_class_losses)
         val_acc = val_correct / val_total * 100
-        val_domain_acc = domain_correct / domain_total * 100
+        val_domain_acc = val_domain_correct / val_domain_total * 100
+
+        f1 = f1_score(val_all_labels, val_all_preds)
+        precision = precision_score(val_all_labels, val_all_preds)
+        recall = recall_score(val_all_labels, val_all_preds)
 
         print(f"🔍Epoch {epoch}/{num_epochs} Validation summary: "
               f"Class-Loss: {avg_val_c_loss:.4f} | "
@@ -281,8 +299,30 @@ def train(
                         f"  ‣ Class-Loss: {avg_val_c_loss:.4f}\n"
                         f"      ‣ Max. Class-Loss: {np.max(val_class_losses):.4f}\n"
                         f"      ‣ Min. Class-Loss: {np.min(val_class_losses):.4f}\n"
-                        f"  ‣ Accuracy: {val_acc:.2f}%\n"
-                        f"  ‣ Epoch time: {epoch_times[-1]:.1f} min \n\n")
+                        f"  ‣ Classification Metrics \n"
+                        f"      ‣ Accuracy: {val_acc:.2f}%\n"
+                        f"      ‣ F1-Score: {f1 * 100:.2f}%\n"
+                        f"      ‣ Precision: {precision * 100:.2f}%\n"
+                        f"      ‣ Recall: {recall * 100:.2f}%\n"
+                        f"‣ Epoch time: {epoch_times[-1]:.1f} min \n\n")
+            
+            writer.add_scalars("Loss", {
+                "Train": avg_c_loss,
+                "Validation": avg_val_c_loss
+            }, epoch)
+            writer.add_scalars("Accuracy", {
+                "Train": acc,
+                "Validation": val_acc
+            }, epoch)
+            writer.add_scalars("Domain", {
+                "Loss": avg_d_loss,
+                "Accuracy": domain_acc
+            }, epoch)
+            writer.add_scalars("Other Metrics", {
+                "F1": f1,
+                "Precision": precision,
+                "Recall": recall
+            }, epoch)
 
         # save if its the best model
         if val_acc > best_val_acc + 0.1:
@@ -305,7 +345,8 @@ def train(
                         f.write(f"Early stopping initiated")
                 print(f"⏹ Early stopping after {epoch} epochs (no improvement).")
                 break
-
+    
+    writer.close()
     print("Training complete.")
 
 

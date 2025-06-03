@@ -43,3 +43,4 @@ GRL_WARMUP_EPOCHS = 1.0
 # Model
 CHECKPOINT_DIR = "models/Domain Adversarial Neural Network/checkpoints"
 LOG_DIR = "models/Domain Adversarial Neural Network/logs"
+TENSORBOARD_DIR = "models/Domain Adversarial Neural Network/tensorboard"
