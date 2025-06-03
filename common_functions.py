@@ -13,9 +13,10 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
-    confusion_matrix
+    ConfusionMatrixDisplay
 )
 from constants import DATASETS
+import matplotlib.pyplot as plt
 
 
 
@@ -60,7 +61,7 @@ def read_all_datasets() -> pd.DataFrame:
 
 
 print("read_processed_data()")
-def read_processed_data(augmented: bool = False):
+def read_processed_data(augmented: bool = False, balanced: bool = False):
     """Load preprocessed (and optionally augmented) data from the pipeline output.
 
     Args:
@@ -75,7 +76,7 @@ def read_processed_data(augmented: bool = False):
     with open("../pipeline/config.yml", "r") as f:
         config = yaml.safe_load(f)
 
-    path = f"../pipeline/{config['output']}/preprocessed_data{'_augmented' if augmented else ''}.parquet"
+    path = f"../pipeline/{config['output']}/preprocessed_data{'_augmented' if augmented else ''}{'_balanced' if balanced else ''}.parquet"
 
     return pd.read_parquet(path)
     
@@ -178,8 +179,12 @@ def evaluate_model(y_test: np.ndarray, y_pred: np.ndarray) -> None:
     print(f"Recall    (avg): {recall_score(y_test, y_pred, average='weighted', zero_division=0):.4f}")
     print(f"F1 Score  (avg): {f1_score(y_test, y_pred, average='weighted', zero_division=0):.4f}")
     print()
-    print("Confusion Matrix:")
-    print(confusion_matrix(y_test, y_pred))
+    ConfusionMatrixDisplay.from_predictions(
+            y_test, y_pred, display_labels=["Real News", "Fake News"], cmap="Blues", colorbar=True
+    )
+    plt.title("Confusion Matrix", fontsize=10)
+    plt.tight_layout()
+    plt.show()
 
 
 print("detect_missing_values()")
