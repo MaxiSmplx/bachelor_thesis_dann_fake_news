@@ -19,6 +19,8 @@ def get_all_files() -> None:
         print(f"\n📁 Downloading Dataset -> {dataset_name}")
         for type, id in dataset.items():
             print(f"📄 Retrieving {type}.parquet")
+            if not os.path.isdir(f"datasets/{dataset_name}"):
+                os.mkdir(f"datasets/{dataset_name}")
             download_drive_file(id, f"datasets/{dataset_name}/{type}.parquet")
 
 
