@@ -21,7 +21,7 @@ All raw datasets are available in a shared [Google Drive folder](https://drive.g
 | Source based FN    | [Kaggle](https://www.kaggle.com/datasets/yash0956/fakenews) |
 | llm-misinformation | [GitHub](https://github.com/llm-misinformation/llm-misinformation) |
 | LIAR2 | [Hugging Facce](https://huggingface.co/datasets/chengxuphd/liar2)|
-| MultiFC | [Hugging Face](https://huggingface.co/datasets/pszemraj/multi_fc)) |
+| MultiFC | [Hugging Face](https://huggingface.co/datasets/pszemraj/multi_fc) |
 | FineFake | [GitHub](https://github.com/Accuser907/FineFake?tab=readme-ov-file) |
 | FEVER | [FEVER](https://fever.ai/dataset/fever.html) |
 | Fakeddit | [Fakeddit](https://fakeddit.netlify.app) |
