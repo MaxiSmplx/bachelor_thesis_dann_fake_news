@@ -38,11 +38,11 @@ The architecture incorporates **Multi-Domain Learning** and **Adversarial Invari
 |--------|--------|------|------|
 | Climate-FEVER | Climate Change | Claims | 1.535 |
 | Fake News Corpus | General News | News Articles | 70.846 |
-| Fake News Prediction | Politics | News Articles | 6.335 |
+| FakeNewsNet | Mixed | News Articles | 23.196 |
 | Fakeddit | Mixed | Claims | 7.000 |
 | FEVER | Mixed | Claims | 109.810 |
 | FineFake | General News | News Articles | 16.909 |
-| ISOT Fake News | Politics | News Articles | 44.898 |
+| MultiFC | Mixed | Claims | 21.148 |
 | LIAR2 | Politics | Claims | 22.962 |
 | llm-misinformation | General News | (LLM generated) News Articles | 7.057 |
 | Source based FN | General News | News Articles | 2.050 |
