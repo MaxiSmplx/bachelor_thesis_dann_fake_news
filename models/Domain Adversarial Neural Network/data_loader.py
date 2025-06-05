@@ -1,6 +1,6 @@
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader
-from config import TOKENIZER, BATCH_SIZE, FILE_PATH, FILE_PATH_AUGMENTED, FILE_PATH_AUGMENTED_BALANCED, FILE_PATH_BALANCED
+from config import TOKENIZER, BATCH_SIZE, FOLDER_PATH_BALANCED, FOLDER_PATH_AUGMENTED, FOLDER_PATH_BALANCED_AUGMENTED, FOLDER_PATH_RAW
 
 tokenizer = TOKENIZER
 
@@ -45,26 +45,45 @@ def get_dataloader(
     shuffle: bool = True,
     num_workers: int = 4
 ) -> DataLoader:
-    file_path = (
-        FILE_PATH_AUGMENTED_BALANCED if balanced else FILE_PATH_AUGMENTED
+    folder_path = (
+        FOLDER_PATH_BALANCED_AUGMENTED if balanced else FOLDER_PATH_AUGMENTED
     ) if augmented else (
-        FILE_PATH_BALANCED if balanced else FILE_PATH
+        FOLDER_PATH_BALANCED if balanced else FOLDER_PATH_RAW
     )
 
-    data = pd.read_parquet(file_path).sample(2_000) #TODO remove
+    if split.lower() in ("train", "tr", "validation", "val"):
+        data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet").sample(frac=1.0).reset_index(drop=True)
+        data = data.sample(n=2_000) #TODO remove
+        split_idx = int(len(data) * (1 - val_fraction))
+        dataset_train, dataset_val = ParquetDataset(data.iloc[:split_idx]), ParquetDataset(data.iloc[split_idx:])
 
-    if split.lower() == "train" or split.lower() == "tr":
-        dataset = ParquetDataset(data.sample(int((len(data) * (1 - val_fraction)))))
-    elif split.lower() == "validation" or split.lower() == "val":
-        dataset = ParquetDataset(data.sample(int((len(data) * val_fraction))))
+        loader_train = DataLoader(
+            dataset_train,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            num_workers=num_workers,
+        )
+        loader_val = DataLoader(
+            dataset_val,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            num_workers=num_workers,
+        )
+
+        return loader_train, loader_val
+
+    elif split.lower() in ("test", "tst"):
+        data = pd.read_parquet(f"{folder_path}/preprocessed_data_test.parquet").sample(frac=1.0).reset_index(drop=True)
+        dataset_test = ParquetDataset(data)
+
+        loader_test = DataLoader(
+            dataset_test,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            num_workers=num_workers,
+        )
+
+        return loader_test
+    
     else:
-        raise ValueError("Unknown data split, either 'train' or 'validation'!")
-
-    loader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        num_workers=num_workers,
-    )
-
-    return loader
+        raise ValueError("Unknown data split, either 'train', 'validation' or 'test'!")

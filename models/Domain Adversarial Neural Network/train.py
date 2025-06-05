@@ -53,21 +53,13 @@ def train(
     num_classes = NUM_CLASSES
     num_domains = NUM_DOMAINS
 
-    train_loader = get_dataloader(split="train", 
+    train_loader, val_loader = get_dataloader(split="train", 
                             val_fraction=0.1, 
                             augmented=augmented,
                             balanced=balanced,
                             batch_size=batch_size, 
                             shuffle=True, 
                             num_workers=4)
-    
-    val_loader = get_dataloader(split="validation",
-                                val_fraction=0.1,
-                                augmented=augmented,
-                                balanced=balanced,
-                                batch_size=batch_size,
-                                shuffle=True,
-                                num_workers=4)
 
     print(f"Loaded Train dataset with {len(train_loader.dataset)} datapoints... \n"
           f"    • Configured batch size: {train_loader.batch_size} \n"

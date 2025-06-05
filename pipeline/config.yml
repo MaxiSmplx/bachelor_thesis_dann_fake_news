@@ -13,13 +13,14 @@ preprocessing:
 
 # Domain tagging settings
 domain_tagging:
-  save_embeddings: False
+  save_embeddings: true
   use_saved_embeddings: true
   n_domains: 13
   plot: true
 
 # Configuration of data augmentation techniques 
 # n_samples: fraction (percent) of the entire DataFrame to augment per step
+# only_augment_small_domains: Only datapoints assigned to domain with lowest datavolume will be augmented
 augmentation:
   synonym_replacement:
     enabled: false
@@ -30,6 +31,7 @@ augmentation:
   paraphrasing:
     enabled: false
     n_samples: 0.01
+  only_augment_small_domains: true
   
 # Selection of augmentation method sources
 augmentation_methods:
@@ -42,7 +44,12 @@ tokenization:
   sequence_max_length: 256
 
 # Settings fo balanced output (lower data volume)
-balance_data: true
+balance_data: 
+  balance: true
+  balance_tolerance: 0.5
+
+# Dataset is split into Train/Validation and Test, this specifies the testsize in %
+test_size: 0.15
 
 # Directory for saving processed data
 output: "output" 

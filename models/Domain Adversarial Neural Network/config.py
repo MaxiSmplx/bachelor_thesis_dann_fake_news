@@ -20,10 +20,10 @@ TOKENIZERS = {
 # Data Loading
 TOKENIZER_NAME = TOKENIZERS["MiniL6"]
 TOKENIZER = AutoTokenizer.from_pretrained(TOKENIZER_NAME, use_fast=True)
-FILE_PATH = "pipeline/output/preprocessed_data.parquet"
-FILE_PATH_AUGMENTED = "pipeline/output/preprocessed_data_augmented.parquet"
-FILE_PATH_BALANCED = "pipeline/output/preprocessed_data_balanced.parquet"
-FILE_PATH_AUGMENTED_BALANCED = "pipeline/output/preprocessed_data_augmented_balanced.parquet"
+FOLDER_PATH_RAW = "pipeline/output/raw"
+FOLDER_PATH_AUGMENTED = "pipeline/output/augmented"
+FOLDER_PATH_BALANCED = "pipeline/output/balanced"
+FOLDER_PATH_BALANCED_AUGMENTED = "pipeline/output/balanced_augmented"
 
 # Model architecture
 INPUT_DIM = AutoConfig.from_pretrained(TOKENIZER_NAME).hidden_size

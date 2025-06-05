@@ -2,6 +2,7 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import ast
+import torch
 from sentence_transformers import SentenceTransformer
 from data_augmentation._openai_api import call_openai
 from sklearn.cluster import MiniBatchKMeans
@@ -11,7 +12,12 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
 def sentence_encoding(df: pd.DataFrame, tokenizer_model, save_to_file: bool) -> np.ndarray:
-    model = SentenceTransformer(tokenizer_model)   
+    device = torch.device("cuda" if torch.cuda.is_available()
+                      else "mps" if torch.backends.mps.is_available()
+                      else "cpu")
+    print(f"Using device >> {device}")
+
+    model = SentenceTransformer(tokenizer_model, device=device) 
     
     embeddings = model.encode(
         df["text"].tolist(),
