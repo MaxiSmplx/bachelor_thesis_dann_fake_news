@@ -84,7 +84,7 @@ def train(
     log_file = f"{LOG_DIR}/logs_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
 
     # Losses & optimizer
-    class_criterion  = nn.CrossEntropyLoss()
+    class_criterion  = nn.BCEWithLogitsLoss()
     domain_criterion = nn.CrossEntropyLoss()
 
     optimizer = AdamW(model.parameters(), lr=lr, weight_decay=5e-4)
@@ -148,7 +148,7 @@ def train(
 
             input_ids = input_ids.to(device)
             attention_mask = attention_mask.to(device)
-            y_lab = y_lab.to(device)
+            y_lab = y_lab.float().unsqueeze(1).to(device)
             y_dom = y_dom.to(device)
 
             x = (input_ids, attention_mask)
@@ -175,15 +175,17 @@ def train(
             running_class_loss[batch_idx] = loss_class.item()
             running_domain_loss[batch_idx] = loss_domain.item()
 
-            preds = class_logits.argmax(dim=1)
-            correct += (preds == y_lab).sum().item()
-            total += y_lab.size(0)
+            probs = torch.sigmoid(class_logits)
+            preds = (probs > 0.5).long().squeeze(1)
+            true_labels = y_lab.long().squeeze(1)
+            correct += (preds == true_labels).sum().item()
+            total += true_labels.size(0)
 
             domain_preds = domain_logits.argmax(dim=1)
             domain_correct += (domain_preds == y_dom).sum().item()
             domain_total += y_dom.size(0)
 
-            batch_acc = (preds == y_lab).sum().item() / y_lab.size(0)
+            batch_acc = (preds == true_labels).sum().item() / true_labels.size(0)
 
             batch_time = (perf_counter() - start_batch_time)
             avg_batch_times += batch_time
@@ -226,7 +228,7 @@ def train(
 
                 input_ids = input_ids.to(device)
                 attention_mask = attention_mask.to(device)
-                y_lab = y_lab.to(device)
+                y_lab = y_lab.float().unsqueeze(1).to(device)
                 y_dom = y_dom.to(device)
 
                 x = (input_ids, attention_mask)
@@ -237,19 +239,21 @@ def train(
                 loss_class = class_criterion(class_logits, y_lab)
                 val_class_losses[val_batch_idx] = loss_class.item()
 
-                preds = class_logits.argmax(dim=1)
+                probs = torch.sigmoid(class_logits)
+                preds = (probs > 0.5).long().squeeze(1)
+                true_labels = y_lab.long().squeeze(1)
 
                 val_all_preds.extend(preds.cpu().numpy()) #TODO if changes from list, this needs to be extend/flattened
-                val_all_labels.extend(y_lab.cpu().numpy())
+                val_all_labels.extend(true_labels.cpu().numpy())
 
-                val_correct += (preds == y_lab).sum().item()
-                val_total += y_lab.size(0)
+                val_correct += (preds == true_labels).sum().item()
+                val_total += true_labels.size(0)
 
                 domain_preds = domain_logits.argmax(dim=1)
                 val_domain_correct += (domain_preds == y_dom.to(device)).sum().item()
                 val_domain_total += y_dom.size(0)
 
-                batch_acc = (preds == y_lab).sum().item() / y_lab.size(0)
+                batch_acc = (preds == true_labels).sum().item() / y_lab.size(0)
                 if (val_batch_idx+1) % progress_treshold_val == 0:
                     print(f"  → [Validation] Processing batch {val_batch_idx+1}/{len(val_loader)} ")
                     print(f"     Class-Loss: {loss_class.item():.4f}")
@@ -259,9 +263,9 @@ def train(
         val_acc = val_correct / val_total * 100
         val_domain_acc = val_domain_correct / val_domain_total * 100
 
-        f1 = f1_score(val_all_labels, val_all_preds)
-        precision = precision_score(val_all_labels, val_all_preds)
-        recall = recall_score(val_all_labels, val_all_preds)
+        f1 = f1_score(val_all_labels, val_all_preds, average='binary')
+        precision = precision_score(val_all_labels, val_all_preds, average='binary')
+        recall = recall_score(val_all_labels, val_all_preds, average='binary')
 
         print(f"🔍Epoch {epoch}/{num_epochs} Validation summary: "
               f"Class-Loss: {avg_val_c_loss:.4f} | "
@@ -338,7 +342,8 @@ def train(
                 print(f"⏹ Early stopping after {epoch} epochs (no improvement).")
                 break
     
-    writer.close()
+    if logging:
+        writer.close()
     print("Training complete.")
 
 

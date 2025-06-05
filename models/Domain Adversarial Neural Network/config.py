@@ -28,7 +28,7 @@ FOLDER_PATH_BALANCED_AUGMENTED = "pipeline/output/balanced_augmented"
 # Model architecture
 INPUT_DIM = AutoConfig.from_pretrained(TOKENIZER_NAME).hidden_size
 FEATURE_DIM = 128 
-NUM_CLASSES = 2
+NUM_CLASSES = 1
 NUM_DOMAINS = config["domain_tagging"]["n_domains"]
 
 # Training Hyperparameters
