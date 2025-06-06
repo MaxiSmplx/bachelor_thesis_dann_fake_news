@@ -80,56 +80,20 @@ GOOGLE_DRIVE_IDS = {
 
 # Google Drive IDs for final processed and augmented dataset
 GOOGLE_DRIVE_FINAL_IDS = {
-    "preprocessed_data": "", #TODO Update
-    "preprocessed_data_augmented": "" #TODO Update
-}
-
-
-# Additional information about each dataset
-METADATA = {
-    "WELFake": {
-        "name": "WELFake",
-        "columns" : ["title","text", "label"],
-        "domain": "",
+    "raw": {
+        "train_val": "",
+        "test": "",
+    }, 
+    "balanced": {
+        "train_val": "",
+        "test": "",
     },
-    "Source based FN": {
-        "name": "Source based FN",
-        "columns" : ["title","text", "label"],
-        "domain": "",
+    "augmented": {
+        "train_val": "",
+        "test": "",
     },
-    "llm-misinformation": {
-        "name": "llm-misinformation",
-        "columns" : ["label", "synthetic_misinformation"],
-        "domain": "",
-    },
-    "LIAR2": {
-        "name": "LIAR2",
-        "columns" : ["id", "label", "statement", "speaker"],
-        "domain": "",
-    },
-    "FineFake": {
-        "name": "FineFake",
-        "columns" : ["text", "label"],
-        "domain": "",
-    },
-    "FEVER": {
-        "name": "FEVER",
-        "columns" : ["label", "claim"],
-        "domain": "",
-    },
-    "Fakeddit": {
-        "name": "Fakeddit",
-        "columns" : ["title", "label"],
-        "domain": "",
-    },
-    "Fake News Corpus": {
-        "name": "Fake News Corpus",
-        "columns" : ["content", "title", "label"],
-        "domain": "",
-    },
-    "Climate-FEVER": {
-        "name": "Climate-FEVER",
-        "columns" : ["claim", "label"],
-        "domain": "",
-    }
+    "balanced_augmented": {
+        "train_val": "",
+        "test": "",
+    }, 
 }

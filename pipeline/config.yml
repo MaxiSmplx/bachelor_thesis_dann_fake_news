@@ -22,10 +22,10 @@ domain_tagging:
 # augmentation_budget: Number of requests to send to openai api, avg. cost per 1000 requests: 0.18$ (GPT-4.1 Nano)
 augmentation:
   style_transfer:
-    enabled: false
+    enabled: true
   paraphrasing:
-    enabled: false
-  augmentation_budget: 10
+    enabled: true
+  augmentation_budget: 5000
 
 # Settings for text tokenization
 tokenization:
@@ -38,7 +38,7 @@ balance_data:
   balance_tolerance: 0.5
 
 # Dataset is split into Train/Validation and Test, this specifies the testsize in %
-test_size: 0.15
+test_size: 0.1
 
 # Directory for saving processed data
 output: "output" 

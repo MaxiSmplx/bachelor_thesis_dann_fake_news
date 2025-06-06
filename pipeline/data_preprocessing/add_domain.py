@@ -51,7 +51,7 @@ def ids_to_topic(samples: dict[int: list[str]]) -> str:
             f"Here is my dict with topic ids and example sentences for each topic:\n{samples}\n\n"
             "Produce only the literal Python dict mapping each topic ID to a distinct, non-overlapping domain label."
             "Also do not include '```python' in your response."
-            "You are free to be assign labels such as 'Satire', but do not frame your labels as judgments on their truthfulness or morality: Avoid anything like 'False Statements', 'Lies', or similar."
+            "You are free to be assign labels such as 'Satire', but do not frame your labels as judgments on their truthfulness or morality: Avoid anything like 'False Statements', 'Lies', 'Unusual or Contradictory Claims', 'Definitions & Factual Statements' or similar."
         )
     response = call_openai(context=context, prompt=prompt, model="gpt-4.1-2025-04-14", temperature=0.2)
     

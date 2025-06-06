@@ -13,17 +13,19 @@ def download_drive_file(file_id: str, output_path: str) -> None:
         print(f"Data {os.path.basename(output_path)} already exists in corresponding folder")
 
 
-def get_files(only_augmented: bool = False) -> None:
+def get_files() -> None:
     with open("config.yml", "r") as f:
         config = yaml.safe_load(f)
 
-    GOOGLE_DRIVE_FINAL_IDS.pop("preprocessed_data", None) if only_augmented else None
-
-    for data_name, id in GOOGLE_DRIVE_FINAL_IDS.items():
-        print(f"\n📁 Downloading Dataset -> {data_name}")
-        download_drive_file(id, f"pipeline/{config['output']}/{data_name}.parquet") #TODO change
+    for folder_name, type_dict in GOOGLE_DRIVE_FINAL_IDS.items():
+        print(f"\n📦 Downloading Folder {folder_name}")
+        if not os.path.isdir(f"{config['output']}/{folder_name}"):
+            os.mkdir(f"{config['output']}/{folder_name}")
+        for type, id in type_dict.items():
+            print(f"\n📁 Downloading Dataset -> {type}")
+            download_drive_file(id, f"pipeline/{config['output']}/{folder_name}/{type}.parquet")
 
 
 if __name__ == "__main__":
     """Download all pipeline output files from Google Drive."""
-    get_files(only_augmented=False)
+    get_files()
