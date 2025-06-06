@@ -52,7 +52,7 @@ def get_dataloader(
     )
 
     if split.lower() in ("train", "tr", "validation", "val"):
-        data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet").sample(frac=1.0).reset_index(drop=True)
+        data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
         data = data.sample(n=2_000) #TODO remove
         split_idx = int(len(data) * (1 - val_fraction))
         dataset_train, dataset_val = ParquetDataset(data.iloc[:split_idx]), ParquetDataset(data.iloc[split_idx:])
@@ -73,7 +73,7 @@ def get_dataloader(
         return loader_train, loader_val
 
     elif split.lower() in ("test", "tst"):
-        data = pd.read_parquet(f"{folder_path}/preprocessed_data_test.parquet").sample(frac=1.0).reset_index(drop=True)
+        data = pd.read_parquet(f"{folder_path}/preprocessed_data_test.parquet")
         dataset_test = ParquetDataset(data)
 
         loader_test = DataLoader(

@@ -6,6 +6,7 @@
 import pandas as pd
 import numpy as np
 import yaml
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     classification_report,
@@ -61,7 +62,7 @@ def read_all_datasets() -> pd.DataFrame:
 
 
 print("read_processed_data()")
-def read_processed_data(augmented: bool = False, balanced: bool = False):
+def read_processed_data(augmented: bool = False, balanced: bool = True) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load preprocessed (and optionally augmented) data from the pipeline output.
 
     Args:
@@ -76,9 +77,19 @@ def read_processed_data(augmented: bool = False, balanced: bool = False):
     with open("../pipeline/config.yml", "r") as f:
         config = yaml.safe_load(f)
 
-    path = f"../pipeline/{config['output']}/preprocessed_data{'_augmented' if augmented else ''}{'_balanced' if balanced else ''}.parquet"
+    folder_name = {
+        (False, False): 'raw',
+        (True,  False): 'balanced',
+        (False, True):  'augmented',
+        (True,  True):  'balanced_augmented'
+    }[(balanced, augmented)]
 
-    return pd.read_parquet(path)
+    folder_path = os.path.join(f"../pipeline/{config['output']}", folder_name)
+
+    data_train = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
+    data_test = pd.read_parquet(f"{folder_path}/preprocessed_data_test.parquet")
+    
+    return data_train, data_test
     
 
 

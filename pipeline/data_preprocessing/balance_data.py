@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def balance_data(df: pd.DataFrame, tolerance: float) -> pd.DataFrame:
     cap = int(df["domain"].value_counts().min() * (1 + tolerance))
@@ -27,3 +28,31 @@ def balance_data(df: pd.DataFrame, tolerance: float) -> pd.DataFrame:
           f"and is now {count_label_new_df[0] / count_label_new_df.sum():.1%} vs. {count_label_new_df[1] / count_label_new_df.sum():.1%}")
 
     return balanced_df
+
+
+def augmentation_threshold(df: pd.DataFrame, augmentation_budget: int) -> dict:
+    counts = df["domain"].value_counts().to_list()
+    names = df["domain"].value_counts().index.tolist()
+    
+    rows_to_augment = [0] * len(counts)
+    domain_diff = [(counts[i] - counts[i+1]) for i in range(len(counts) - 1)]
+
+    for i in range(len(domain_diff)):
+        diff_value = min(domain_diff[-(i+1)], augmentation_budget)
+        indices_to_update = range(len(counts) - i - 1, len(counts))
+
+        if len(indices_to_update) == 0 or diff_value == 0:
+            continue
+
+        # Distribute the diff_value equally or as much as possible
+        per_index = diff_value // len(indices_to_update)
+        remainder = diff_value % len(indices_to_update)
+
+        for idx, j in enumerate(indices_to_update):
+            rows_to_augment[j] += per_index + (1 if idx < remainder else 0)
+
+        augmentation_budget -= diff_value
+        if augmentation_budget == 0:
+            break
+
+    return dict(zip(names, rows_to_augment))

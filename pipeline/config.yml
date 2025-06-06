@@ -19,24 +19,13 @@ domain_tagging:
   plot: true
 
 # Configuration of data augmentation techniques 
-# n_samples: fraction (percent) of the entire DataFrame to augment per step
-# only_augment_small_domains: Only datapoints assigned to domain with lowest datavolume will be augmented
+# augmentation_budget: Number of requests to send to openai api, avg. cost per 1000 requests: 0.18$ (GPT-4.1 Nano)
 augmentation:
-  synonym_replacement:
-    enabled: false
-    n_samples: 0.01
   style_transfer:
     enabled: false
-    n_samples: 0.01
   paraphrasing:
     enabled: false
-    n_samples: 0.01
-  only_augment_small_domains: true
-  
-# Selection of augmentation method sources
-augmentation_methods:
-  local_database: false
-  llm: true
+  augmentation_budget: 10
 
 # Settings for text tokenization
 tokenization:

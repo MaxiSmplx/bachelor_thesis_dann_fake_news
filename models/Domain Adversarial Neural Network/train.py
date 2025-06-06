@@ -23,7 +23,7 @@ from data_loader import get_dataloader
 from datetime import datetime, timedelta
 from time import perf_counter
 
-def grl_lambda(iter_num: int, max_iter: int, ceiling: float = 0.5, delay: float = 0.1) -> float:
+def grl_lambda(iter_num: int, max_iter: int, ceiling: float = 0.5, delay: float = 0.2) -> float:
     p = iter_num / max_iter
     if p < delay:
         return 0.0
@@ -70,7 +70,8 @@ def train(
           f"    • Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n"
           f"    • Using Tokenizer {TOKENIZER_NAME} \n"
           f"Loaded Validation dataset with {len(val_loader.dataset)} datapoints... \n"
-          f"    • {len(val_loader)} batches per epoch \n")
+          f"    • {len(val_loader)} batches per epoch \n"
+          f"Enabled Logging, to view Tensorboard logs call 'tensorboard --logdir=<TENSORBOARD_DIR>'")
 
     # Model
     model = DANN(
@@ -110,7 +111,7 @@ def train(
                     f"  Num Epochs: {num_epochs} \n"
                     f"  Optimizer: {optimizer.__class__.__name__} \n\n\n\n")
             
-        writer = SummaryWriter(log_dir=TENSORBOARD_DIR)
+        writer = SummaryWriter(log_dir=f"{TENSORBOARD_DIR}/run_{datetime.now().strftime('%Y%m%d-%H%M%S')}")
 
     best_val_acc = 0.0
     best_model_path = None
