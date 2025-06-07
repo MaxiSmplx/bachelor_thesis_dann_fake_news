@@ -37,8 +37,8 @@ BATCH_SIZE = 48
 NUM_EPOCHS = 20
 
 # Gradient Reversal Layer schedule
-GRL_LAMBDA_MAX = 1.0
-GRL_WARMUP_EPOCHS = 1.0
+GRL_LAMBDA_CEILING= 0.5
+GRL_WARMUP = 0.2
 
 # Model
 CHECKPOINT_DIR = "models/Domain Adversarial Neural Network/checkpoints"

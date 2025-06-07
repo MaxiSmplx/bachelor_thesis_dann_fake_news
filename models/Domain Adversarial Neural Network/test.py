@@ -2,7 +2,6 @@ from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_sc
 from data_loader import get_dataloader
 from model import DANN
 from time import perf_counter
-from datetime import datetime
 import numpy as np
 import torch
 from config import (

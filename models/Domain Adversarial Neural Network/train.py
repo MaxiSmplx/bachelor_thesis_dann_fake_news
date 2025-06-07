@@ -16,14 +16,16 @@ from config import (
     LOG_DIR, 
     TENSORBOARD_DIR,
     BATCH_SIZE,
-    TOKENIZER_NAME
+    TOKENIZER_NAME,
+    GRL_LAMBDA_CEILING,
+    GRL_WARMUP
 )
 from model import DANN
 from data_loader import get_dataloader
 from datetime import datetime, timedelta
 from time import perf_counter
 
-def grl_lambda(iter_num: int, max_iter: int, ceiling: float = 0.5, delay: float = 0.2) -> float:
+def grl_lambda(iter_num: int, max_iter: int, ceiling: float = GRL_LAMBDA_CEILING, delay: float = GRL_WARMUP) -> float:
     p = iter_num / max_iter
     if p < delay:
         return 0.0
@@ -38,7 +40,7 @@ def train(
     save_dir: str = CHECKPOINT_DIR,
     logging: bool = False,
     augmented: bool = False,
-    balanced: bool = False,
+    balanced: bool = True,
 ):
     print("\n🚀 Starting training run...")
 
@@ -122,8 +124,8 @@ def train(
 
     epoch_times = []
 
-    progress_treshold_train = max(1, len(train_loader) // 5)
-    progress_treshold_val = max(1, len(val_loader) // 3)
+    progress_treshold_train = max(1, len(train_loader) // 10)
+    progress_treshold_val = max(1, len(val_loader) // 5)
 
     for epoch in range(1, num_epochs + 1):
         if device.type == "mps":
