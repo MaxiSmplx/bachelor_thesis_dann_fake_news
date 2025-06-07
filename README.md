@@ -30,9 +30,9 @@ The architecture incorporates **Multi-Domain Learning** and **Adversarial Invari
 
 ---
 
-## 📊 Datasets Used
+## 📊 Datasets
 
-### 🚂 Training Datasets
+### 🚂 Dataset Overview
 
 | Dataset | Domain | Type | Size |
 |--------|--------|------|------|
@@ -49,13 +49,7 @@ The architecture incorporates **Multi-Domain Learning** and **Adversarial Invari
 | WELFake | General News | News Articles | 72.095 |
 
 
-### 🧪 Test Datasets
-
-| Dataset | Domain | Type | Size |
-|--------|--------|------|------|
-
-TODO
-
+### ⬇️ Dataset Download
 All datasets can be found at:  
 🔗 **[Raw Datasets](https://drive.google.com/drive/folders/1d_2XZ3N9c1Nmncj1CSrnQAaUaoG_xkyv?usp=share_link)** \
 🔗 **[Processed Datasets](https://drive.google.com/drive/folders/1-uSCjx6wC7Rh-6gJ1MC0rUFKoF1chw42?usp=share_link)** \

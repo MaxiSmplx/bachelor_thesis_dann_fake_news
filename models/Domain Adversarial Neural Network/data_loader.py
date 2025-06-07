@@ -53,7 +53,6 @@ def get_dataloader(
 
     if split.lower() in ("train", "tr", "validation", "val"):
         data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
-        data = data.sample(n=2_000) #TODO remove
         split_idx = int(len(data) * (1 - val_fraction))
         dataset_train, dataset_val = ParquetDataset(data.iloc[:split_idx]), ParquetDataset(data.iloc[split_idx:])
 

@@ -33,7 +33,6 @@ def grl_lambda(iter_num: int, max_iter: int, ceiling: float = 0.5, delay: float 
 
 def train(
     batch_size: int = BATCH_SIZE,
-    feature_dim: int = FEATURE_DIM,
     lr: float = LEARNING_RATE,
     num_epochs: int = NUM_EPOCHS,
     save_dir: str = CHECKPOINT_DIR,
@@ -41,7 +40,7 @@ def train(
     augmented: bool = False,
     balanced: bool = False,
 ):
-    print("🚀 Starting training run...")
+    print("\n🚀 Starting training run...")
 
     # Device
     device = torch.device("cuda" if torch.cuda.is_available() 
@@ -52,6 +51,8 @@ def train(
     # Data Loader
     num_classes = NUM_CLASSES
     num_domains = NUM_DOMAINS
+    input_dim = INPUT_DIM
+    feature_dim = FEATURE_DIM
 
     train_loader, val_loader = get_dataloader(split="train", 
                             val_fraction=0.1, 
@@ -75,7 +76,7 @@ def train(
 
     # Model
     model = DANN(
-        input_dim=INPUT_DIM,
+        input_dim=input_dim,
         feature_dim=feature_dim,
         num_classes=num_classes,
         num_domains=num_domains
@@ -220,8 +221,8 @@ def train(
         val_total = 0
         val_domain_correct = 0
         val_domain_total = 0
-        val_all_preds = [] #TODO as numpy arrays?
-        val_all_labels = [] #TODO as numpy arrays?
+        val_all_preds = []
+        val_all_labels = []
 
         with torch.no_grad():
             for val_batch_idx, val_batch in enumerate(val_loader):
@@ -244,7 +245,7 @@ def train(
                 preds = (probs > 0.5).long().squeeze(1)
                 true_labels = y_lab.long().squeeze(1)
 
-                val_all_preds.extend(preds.cpu().numpy()) #TODO if changes from list, this needs to be extend/flattened
+                val_all_preds.extend(preds.cpu().numpy())
                 val_all_labels.extend(true_labels.cpu().numpy())
 
                 val_correct += (preds == true_labels).sum().item()
@@ -264,6 +265,8 @@ def train(
         val_acc = val_correct / val_total * 100
         val_domain_acc = val_domain_correct / val_domain_total * 100
 
+        val_all_preds = np.array(val_all_preds)
+        val_all_labels = np.array(val_all_labels)
         f1 = f1_score(val_all_labels, val_all_preds, average='binary')
         precision = precision_score(val_all_labels, val_all_preds, average='binary')
         recall = recall_score(val_all_labels, val_all_preds, average='binary')
