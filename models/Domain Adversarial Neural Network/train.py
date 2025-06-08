@@ -148,13 +148,6 @@ def train(
         start_epoch_time = perf_counter()
         print(f"\n── Epoch {epoch}/{num_epochs} ──")
 
-        if epoch == 2: 
-            for p in model.feature_extractor.encoder.parameters():
-                p.requires_grad = False
-        elif epoch == 3:
-            for p in model.feature_extractor.encoder.parameters():
-                p.requires_grad = True
-
         model.train()
 
         running_class_loss = np.empty(len(train_loader))
