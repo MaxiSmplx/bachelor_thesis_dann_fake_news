@@ -4,6 +4,7 @@ from model import DANN
 from time import perf_counter
 import numpy as np
 import torch
+import argparse
 import os
 from config import (
     NUM_CLASSES,
@@ -13,13 +14,13 @@ from config import (
     LOG_DIR
 )
 
-def test(model_checkpoint: str , logging: bool = True):
+def test(model_checkpoint: str , logging: bool = True, balanced: bool = False, augmented: bool = True):
     print(f"\n🚀 Starting evaluation...\n")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
     print(f"Using device >> {device}\n")
 
-    test_loader = get_dataloader("test", balanced=True, batch_size=48)
+    test_loader = get_dataloader("test", balanced=balanced, augmented=augmented, batch_size=48)
     print(f"Loaded Test Data with {len(test_loader.dataset)} datapoints")
 
     num_classes = NUM_CLASSES
@@ -113,4 +114,18 @@ def test(model_checkpoint: str , logging: bool = True):
             
 
 if __name__ == "__main__":
-    test("dann_2025-06-06-17-28_acc-61.00", logging=True)
+    parser = argparse.ArgumentParser(description="Test DANN model")
+
+    parser.add_argument("--model", type=str, help="Model checkpoint")
+    parser.add_argument("--augmented", action="store_true", help="Use augmented data")
+    parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
+    parser.add_argument("--log", action="store_true", help="Enable TensorBoard and logging")
+
+    args = parser.parse_args()
+
+    test(
+        model_checkpoint=args.model,
+        logging=args.log,
+        balanced=args.balanced,
+        augmented=args.augmented
+    )

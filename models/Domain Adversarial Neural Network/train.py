@@ -24,6 +24,7 @@ from model import DANN
 from data_loader import get_dataloader
 from datetime import datetime, timedelta
 from time import perf_counter
+import argparse
 
 def grl_lambda(iter_num: int, max_iter: int, ceiling: float = GRL_LAMBDA_CEILING, delay: float = GRL_WARMUP) -> float:
     p = iter_num / max_iter
@@ -354,4 +355,20 @@ def train(
 
 
 if __name__ == "__main__":
-    train(balanced=True, logging=True)
+    parser = argparse.ArgumentParser(description="Train DANN model")
+
+    parser.add_argument("--batch_size", type=int, default=BATCH_SIZE, help="Batch size")
+    parser.add_argument("--epochs", type=int, default=NUM_EPOCHS, help="Number of epochs")
+    parser.add_argument("--augmented", action="store_true", help="Use augmented data")
+    parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
+    parser.add_argument("--log", action="store_true", help="Enable TensorBoard and logging")
+
+    args = parser.parse_args()
+
+    train(
+        batch_size=args.batch_size,
+        num_epochs=args.epochs,
+        augmented=args.augmented,
+        balanced=args.balanced,
+        logging=args.log
+    )
