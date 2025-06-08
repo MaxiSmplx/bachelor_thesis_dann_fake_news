@@ -92,7 +92,20 @@ def train(
     class_criterion  = nn.BCEWithLogitsLoss()
     domain_criterion = nn.CrossEntropyLoss()
 
-    optimizer = AdamW(model.parameters(), lr=lr, weight_decay=5e-4)
+    transformer_params = list(model.feature_extractor.encoder.parameters())
+    newly_init_params = (
+        list(model.feature_extractor.feature.parameters())
+        + list(model.label_predictor.parameters())
+        + list(model.domain_classifier.parameters())
+    )
+
+    optimizer = AdamW(
+        [
+            {"params": transformer_params, "lr": 2e-5},
+            {"params": newly_init_params, "lr": 1e-4},
+        ],
+        weight_decay=5e-4,
+    )
 
     # Training loop
     total_iters = num_epochs * len(train_loader)
@@ -111,7 +124,7 @@ def train(
                     f"  Tokenizer: {TOKENIZER_NAME} \n"
                     f"  Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
                     f"  Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n"
-                    f"  Batch Size: {BATCH_SIZE} \n"
+                    f"  Batch Size: {batch_size} \n"
                     f"  Num Epochs: {num_epochs} \n"
                     f"  Optimizer: {optimizer.__class__.__name__} \n\n\n\n")
             
