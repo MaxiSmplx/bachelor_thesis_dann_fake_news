@@ -49,6 +49,7 @@ def test(model_checkpoint: str , logging: bool = True, balanced: bool = False, a
     domain_total = 0
 
     batch_times = np.empty(len(test_loader))
+    progress_treshold = max(1, len(test_loader) // 10)
 
     print(f"🔍 Starting evaluation...")
     with torch.no_grad():
@@ -78,7 +79,7 @@ def test(model_checkpoint: str , logging: bool = True, balanced: bool = False, a
 
             batch_times[batch_idx] = (perf_counter() - batch_start_time)
 
-            if (batch_idx + 1) == 1 or (batch_idx + 1) % 10 == 0 or (batch_idx + 1) == len(test_loader):
+            if (batch_idx + 1) == 1 or (batch_idx + 1) % progress_treshold == 0 or (batch_idx + 1) == len(test_loader):
                 print(f"    → Processed {batch_idx + 1}/{len(test_loader)} batches | "
                       f"ETA: {((len(test_loader) - (batch_idx + 1)) * np.mean(batch_times[:batch_idx + 1])):.2f} sec")
 

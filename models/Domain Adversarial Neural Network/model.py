@@ -1,6 +1,6 @@
 import torch.nn as nn
 from torch.autograd import Function
-from transformers import AutoModel
+from transformers import AutoModel, AutoConfig
 from config import TOKENIZER_NAME
 
 class GradReverse(Function):
@@ -25,7 +25,13 @@ class FeatureExtractor(nn.Module):
     def __init__(self, input_dim, feature_dim):
         super().__init__()
 
-        self.encoder = AutoModel.from_pretrained(TOKENIZER_NAME)
+        enc_cfg = AutoConfig.from_pretrained(
+            TOKENIZER_NAME,
+            hidden_dropout_prob=0.2,
+            attention_probs_dropout_prob=0.2,
+        )
+
+        self.encoder = AutoModel.from_pretrained(TOKENIZER_NAME, config=enc_cfg)
 
         self.feature = nn.Sequential(
             nn.Linear(input_dim, 512),
