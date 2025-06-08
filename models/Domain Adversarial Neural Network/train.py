@@ -99,12 +99,19 @@ def train(
         + list(model.domain_classifier.parameters())
     )
 
+    def decay_filter(p):
+        return p.ndim >= 2 and "bias" not in p.name and "LayerNorm" not in p.name
+
+    decay, no_decay = [], []
+    for n, p in model.named_parameters():
+        (decay if decay_filter(p) else no_decay).append(p)
+
     optimizer = AdamW(
         [
-            {"params": transformer_params, "lr": 2e-5},
-            {"params": newly_init_params, "lr": 1e-4},
-        ],
-        weight_decay=5e-4,
+            {"params": decay,     "lr": 2e-5, "weight_decay": 1e-2},
+            {"params": no_decay,  "lr": 2e-5, "weight_decay": 0.0},
+            {"params": newly_init_params, "lr": 1e-4, "weight_decay": 1e-2},
+        ]
     )
 
     # Training loop
