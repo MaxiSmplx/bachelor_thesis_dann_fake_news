@@ -107,14 +107,6 @@ def train(
         weight_decay=5e-4,
     )
 
-    from transformers import get_linear_schedule_with_warmup
-    num_training_steps = num_epochs * len(train_loader)
-    scheduler = get_linear_schedule_with_warmup(
-        optimizer,
-        num_warmup_steps=int(0.1 * num_training_steps), 
-        num_training_steps=num_training_steps,
-    )
-
     # Training loop
     total_iters = num_epochs * len(train_loader)
     iter_num = 0
@@ -196,7 +188,6 @@ def train(
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            scheduler.step()
 
             # track stats
             running_class_loss[batch_idx] = loss_class.item()
