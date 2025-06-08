@@ -104,7 +104,7 @@ def train(
             {"params": transformer_params, "lr": 2e-5},
             {"params": newly_init_params, "lr": 1e-4},
         ],
-        weight_decay=1e-2,
+        weight_decay=5e-4,
     )
 
     # Training loop
@@ -147,6 +147,13 @@ def train(
 
         start_epoch_time = perf_counter()
         print(f"\n── Epoch {epoch}/{num_epochs} ──")
+
+        if epoch == 2: 
+            for p in model.feature_extractor.encoder.parameters():
+                p.requires_grad = False
+        elif epoch == 3:
+            for p in model.feature_extractor.encoder.parameters():
+                p.requires_grad = True
 
         model.train()
 
