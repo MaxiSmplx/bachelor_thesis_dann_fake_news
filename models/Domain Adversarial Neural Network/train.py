@@ -350,7 +350,7 @@ def train(
     
     if logging:
         writer.close()
-    print("Training complete.")
+    print(f"Training complete. Best weights found achieved accuracy of {best_val_acc:.2f}%.")
 
 
 if __name__ == "__main__":

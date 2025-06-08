@@ -24,7 +24,7 @@ def balance_data(df: pd.DataFrame, tolerance: float) -> pd.DataFrame:
     count_label_new_df = balanced_df["label"].value_counts()
     
     print(f"Max. difference in assigned rows to domain was {count_domain_old_df.max() - count_domain_old_df.min()} rows and is now {count_domain_new_df.max() - count_domain_new_df.min()} rows")
-    print(f"Label imbalance (0 vs. 1) was {count_label_old_df[0] / count_label_old_df.sum():.2} vs. {count_label_old_df[1] / count_label_old_df.sum():.2%} "
+    print(f"Label imbalance (0 vs. 1) was {count_label_old_df[0] / count_label_old_df.sum():.2%} vs. {count_label_old_df[1] / count_label_old_df.sum():.2%} "
           f"and is now {count_label_new_df[0] / count_label_new_df.sum():.2%} vs. {count_label_new_df[1] / count_label_new_df.sum():.2%}")
 
     return balanced_df

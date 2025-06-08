@@ -4,14 +4,16 @@ from model import DANN
 from time import perf_counter
 import numpy as np
 import torch
+import os
 from config import (
     NUM_CLASSES,
     NUM_DOMAINS,
     INPUT_DIM,
-    FEATURE_DIM
+    FEATURE_DIM,
+    LOG_DIR
 )
 
-def test(model_checkpoint: str):
+def test(model_checkpoint: str , logging: bool = True):
     print(f"\n🚀 Starting evaluation...\n")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
@@ -96,8 +98,19 @@ def test(model_checkpoint: str):
     print(f"Precision: {precision * 100:.2f}%")
     print(f"Recall: {recall * 100:.2f}%")
 
-
+    if logging:
+        if not os.path.isdir(f"{LOG_DIR}/results"):
+            os.makedirs(f"{LOG_DIR}/results")
+        log_file = f"{LOG_DIR}/results/{model_checkpoint.split('_acc')[0]}"
+        with open(log_file, "w") as f:
+            f.write(f"Summary of Test Run for model \n"
+                    f"  → {model_checkpoint} \n\n"
+                    f"Classification Accuracy: {accuracy * 100:.2f}% \n"
+                    f"Domain Accuracy: {domain_acc * 100:.2f}% \n"
+                    f"F1 Score: {f1 * 100:.2f}% \n"
+                    f"Precision: {precision * 100:.2f}% \n"
+                    f"Recall: {recall * 100:.2f}%")
             
 
 if __name__ == "__main__":
-    test("dann_2025-06-06-17-28_acc-61.00")
+    test("dann_2025-06-06-17-28_acc-61.00", logging=True)

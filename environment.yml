@@ -25,9 +25,6 @@ dependencies:
       - gdown
       - PyYAML
       - torch
-      - torchvision
-      - torchaudio
-      - torchtext
       - sentence-transformers
       - tf-keras
       - tensorboard
