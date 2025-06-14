@@ -133,7 +133,7 @@ def train(
     best_val_acc = 0.0
     best_model_path = None
 
-    es_patience = 3
+    es_patience = 5
     es_epochs_no_improve = 0
 
     epoch_times = []
