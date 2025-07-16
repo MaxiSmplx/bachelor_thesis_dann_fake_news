@@ -13,19 +13,26 @@ preprocessing:
 
 # Domain tagging settings
 domain_tagging:
-  save_embeddings: true
-  use_saved_embeddings: true
+  save_embeddings: false
+  use_saved_embeddings: false
   n_domains: 13
   plot: true
 
 # Configuration of data augmentation techniques 
 # augmentation_budget: Number of requests to send to openai api, avg. cost per 1000 requests: 0.18$ (GPT-4.1 Nano)
+# methods
+#   equalized: Augments every domain with the same number of samples
+#   demand_based: Balanced the domain with the least amount of samples first, then second-to-last and so on
 augmentation:
   style_transfer:
-    enabled: false
+    enabled: true
   paraphrasing:
-    enabled: false
+    enabled: true
   augmentation_budget: 5000
+  methods:
+    equalized: true
+    demand_based: false
+
 
 # Settings for text tokenization
 tokenization:
@@ -38,7 +45,16 @@ balance_data:
   balance_tolerance: 0.5
 
 # Dataset is split into Train/Validation and Test, this specifies the testsize in %
-test_size: 0.1
+
+# If test_cross_domains is enabled, the test dataset will only consist of domains not present in the train/val dataset
+#   random_domains specifies if the held-out domains in the test set are chosen at random (default: n domains with least amount of samples)
+#   n_domains is the number of held-out domains
+# test_size specifies the size of the test dataset, only works if random_domains is disabled
+test_set:
+  test_cross_domains: false
+  random_domains: true
+  n_domains: 1
+  test_size: 0.1
 
 # Directory for saving processed data
 output: "output" 
