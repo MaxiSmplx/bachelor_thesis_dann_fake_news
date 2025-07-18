@@ -28,3 +28,4 @@ dependencies:
       - sentence-transformers
       - tf-keras
       - tensorboard
+      - accelerate
