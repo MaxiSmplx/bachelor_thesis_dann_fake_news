@@ -3,7 +3,10 @@ from transformers import Trainer, TrainingArguments
 from torch.utils.data import TensorDataset
 from data_loader import get_dataset, BERTDataset
 from sklearn.metrics import accuracy_score
+from datetime import datetime
 import pandas as pd
+import argparse
+import os
 import torch
 
 def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool = False, val_fraction: float = 0.1) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -43,15 +46,15 @@ def prepare_trainer(train_dataset, val_dataset, epochs: int = 10, batch_size: in
     model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
     training_args = TrainingArguments(
-        output_dir="./results",
+        output_dir="models/LLM/results",
         eval_strategy="epoch",
         save_strategy="epoch",
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         num_train_epochs=epochs,
         metric_for_best_model="accuracy",
-        logging_dir="./logs",
-        logging_steps=10,
+        logging_strategy="steps",
+        logging_steps=10,  
     )
 
     trainer = Trainer(
@@ -64,20 +67,81 @@ def prepare_trainer(train_dataset, val_dataset, epochs: int = 10, batch_size: in
 
     return trainer
 
+def train(
+    batch_size: int = 64,
+    num_epochs: int = 10,
+    cross_domain: bool = True,
+    augmented: bool = False,
+    balanced: bool = False):
+    if not os.path.isdir("models/LLM/output"):
+        os.mkdir("models/LLM/output")
+    if not os.path.isdir("models/LLM/models"):
+        os.mkdir("models/LLM/models")
 
-if __name__ == "__main__":
-    train_data, val_data, test_data = get_data(cross_domain=True, augmented=False, balanced=False)
+    output_folder_path = f"models/LLM/output/training_summary_{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
 
+    print("Loading data...")
+    train_data, val_data, test_data = get_data(cross_domain=cross_domain, augmented=augmented, balanced=balanced)
+
+    with open(output_folder_path, "a") as f:
+        f.write(
+            f"Training Details \n"
+            f"  Training Data: {len(train_data)} data points, {len(train_data['domain'].unique())} domains \n"
+            f"  Evaluation Data: {len(val_data)} \n"
+            f"  Test Data: {len(test_data)}, {len(test_data['domain'].unique())} domain(s) \n"
+            f"  Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
+            f"      {test_data['domain'].unique().tolist() if cross_domain else len(test_data['domain'].unique())} domain(s) \n"
+            f"  Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
+            f"  Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n\n\n"
+        )
+
+    print("Tokenizing data...")
     train_dataset, val_dataset, test_dataset = tokenize_data(train_data, val_data, test_data)
 
-    trainer = prepare_trainer(train_dataset, val_dataset, epochs=10, batch_size=8)
+    print("Preparing trainer...")
+    trainer = prepare_trainer(train_dataset, val_dataset, epochs=num_epochs, batch_size=batch_size)
 
+    print("Starting training...")
     trainer.train()
 
-    eval_result = trainer.evaluate(eval_dataset=test_dataset)
-    print(eval_result)
+    print("Evaluating on test dataset...")
+    test_metrics = trainer.evaluate(eval_dataset=test_dataset)
 
-    # trainer.save_model("bert-fake-news-detector")
+    with open(output_folder_path, "a") as f:
+        f.write("===== Training Log Summary =====\n")
+        for entry in trainer.state.log_history:
+            for key, value in entry.items():
+                f.write(f"{key}: {value}\n")
+            f.write("\n")
+
+        f.write("===== Final Test Evaluation =====\n")
+        for key, value in test_metrics.items():
+            f.write(f"{key}: {value:.4f}\n")
+
+    print(f"Final Test Accuracy: {test_metrics['eval_accuracy'] * 100}%")
+
+    trainer.save_model(f"models/LLM/models/BERT_{datetime.now().strftime('%Y%m%d-%H%M%S')}_{test_metrics['eval_accuracy'] * 100}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Finetune LLM model")
+
+    parser.add_argument("--batch_size", type=int, default=64, help="Batch size")
+    parser.add_argument("--epochs", type=int, default=10, help="Number of epochs")
+    parser.add_argument("--cross_domain", action="store_true", help="Train in cross-domain setting")
+    parser.add_argument("--augmented", action="store_true", help="Use augmented data")
+    parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
+
+    args = parser.parse_args()
+
+    train(
+        batch_size=args.batch_size,
+        num_epochs=args.epochs,
+        cross_domain=args.cross_domain,
+        augmented=args.augmented,
+        balanced=args.balanced
+    )
+
 
 
 

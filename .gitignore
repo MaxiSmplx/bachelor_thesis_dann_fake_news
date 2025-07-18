@@ -18,8 +18,12 @@ __pycache__/
 # Tensorboard logs
 **/tensorboard/
 
-Other logs
+# Other logs
 **/logs/
 
-Model checkpoints
+# Model checkpoints
 **/checkpoints
+
+# Ignore everything in models/LLM/models/
+models/LLM/models/*
+models/LLM/results/*
