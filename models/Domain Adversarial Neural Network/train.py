@@ -9,7 +9,6 @@ from config import (
     INPUT_DIM, 
     NUM_CLASSES, 
     NUM_DOMAINS, 
-    LEARNING_RATE, 
     NUM_EPOCHS, 
     CHECKPOINT_DIR, 
     FEATURE_DIM, 
@@ -36,12 +35,12 @@ def grl_lambda(iter_num: int, max_iter: int, ceiling: float = GRL_LAMBDA_CEILING
 
 def train(
     batch_size: int = BATCH_SIZE,
-    lr: float = LEARNING_RATE,
     num_epochs: int = NUM_EPOCHS,
     save_dir: str = CHECKPOINT_DIR,
     logging: bool = False,
+    cross_domain: bool = True,
     augmented: bool = False,
-    balanced: bool = True,
+    balanced: bool = False,
 ):
     print("\n🚀 Starting training run...")
 
@@ -59,6 +58,7 @@ def train(
 
     train_loader, val_loader = get_dataloader(split="train", 
                             val_fraction=0.1, 
+                            cross_domain=cross_domain,
                             augmented=augmented,
                             balanced=balanced,
                             batch_size=batch_size, 
@@ -70,6 +70,8 @@ def train(
           f"    • {len(train_loader)} batches per epoch \n"
           f"    • Detected {(no_dom := len(train_loader.dataset.df['domain'].unique()))} domains \n"
           f"        • Ideal domain accuracy: {(1/no_dom)*100:.2f}% \n"
+          f"    • Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
+          f"        • Training with {no_dom} domains and testing on {NUM_DOMAINS - no_dom} held-out domains"
           f"    • Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
           f"    • Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n"
           f"    • Using Tokenizer {TOKENIZER_NAME} \n"
@@ -122,6 +124,7 @@ def train(
         with open(log_file, "a") as f:
             f.write(f"=== Run Configuration === \n\n"
                     f"  Tokenizer: {TOKENIZER_NAME} \n"
+                    f"  Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
                     f"  Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
                     f"  Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n"
                     f"  Batch Size: {batch_size} \n"
@@ -372,6 +375,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--batch_size", type=int, default=BATCH_SIZE, help="Batch size")
     parser.add_argument("--epochs", type=int, default=NUM_EPOCHS, help="Number of epochs")
+    parser.add_argument("--cross_domain", action="store_true", help="Train in cross-domain setting")
     parser.add_argument("--augmented", action="store_true", help="Use augmented data")
     parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
     parser.add_argument("--log", action="store_true", help="Enable TensorBoard and logging")
@@ -381,6 +385,7 @@ if __name__ == "__main__":
     train(
         batch_size=args.batch_size,
         num_epochs=args.epochs,
+        cross_domain=args.cross_domain,
         augmented=args.augmented,
         balanced=args.balanced,
         logging=args.log

@@ -1,6 +1,7 @@
 import pandas as pd
+import yaml, os
 from torch.utils.data import Dataset, DataLoader
-from config import TOKENIZER, BATCH_SIZE, FOLDER_PATH_BALANCED, FOLDER_PATH_AUGMENTED, FOLDER_PATH_BALANCED_AUGMENTED, FOLDER_PATH_RAW
+from config import TOKENIZER, BATCH_SIZE
 
 tokenizer = TOKENIZER
 
@@ -39,17 +40,26 @@ class ParquetDataset(Dataset):
 def get_dataloader(
     split: str =  "train",
     val_fraction: float = 0.1,
+    cross_domain: bool = True,
     augmented: bool = False,
     balanced: bool = False,
     batch_size: int = BATCH_SIZE,
     shuffle: bool = True,
     num_workers: int = 4
 ) -> DataLoader:
-    folder_path = (
-        FOLDER_PATH_BALANCED_AUGMENTED if balanced else FOLDER_PATH_AUGMENTED
-    ) if augmented else (
-        FOLDER_PATH_BALANCED if balanced else FOLDER_PATH_RAW
-    )
+    with open("pipeline/config.yml", "r") as f:
+        config = yaml.safe_load(f)
+
+    folder_name = {
+        (False, False): 'raw',
+        (True,  False): 'balanced',
+        (False, True):  'augmented',
+        (True,  True):  'balanced_augmented'
+    }[(balanced, augmented)]
+
+    folder_attribute = "cross_domain" if cross_domain else "in_domain"
+
+    folder_path = os.path.join(f"pipeline/{config['output']}", folder_attribute, folder_name)
 
     if split.lower() in ("train", "tr", "validation", "val"):
         data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")

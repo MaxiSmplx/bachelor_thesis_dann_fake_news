@@ -14,14 +14,15 @@ from config import (
     LOG_DIR
 )
 
-def test(model_checkpoint: str , logging: bool = True, balanced: bool = False, augmented: bool = True):
+def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True, balanced: bool = False, augmented: bool = True):
     print(f"\n🚀 Starting evaluation...\n")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
     print(f"Using device >> {device}\n")
 
-    test_loader = get_dataloader("test", balanced=balanced, augmented=augmented, batch_size=48)
+    test_loader = get_dataloader("test", cross_domain=cross_domain, balanced=balanced, augmented=augmented, batch_size=48)
     print(f"Loaded Test Data with {len(test_loader.dataset)} datapoints")
+    print(f"Testing on domain(s): {test_loader.dataset['domain'].unique().tolist()}") if cross_domain else print("Testing on all {NUM_DOMAINS} domains")
 
     num_classes = NUM_CLASSES
     num_domains = NUM_DOMAINS
@@ -119,6 +120,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--model", type=str, help="Model checkpoint")
     parser.add_argument("--augmented", action="store_true", help="Use augmented data")
+    parser.add_argument("--cross_domain", action="store_true", help="Train in cross-domain setting")
     parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
     parser.add_argument("--log", action="store_true", help="Enable TensorBoard and logging")
 
@@ -127,6 +129,7 @@ if __name__ == "__main__":
     test(
         model_checkpoint=args.model,
         logging=args.log,
+        cross_domain=args.cross_domain,
         balanced=args.balanced,
         augmented=args.augmented
     )

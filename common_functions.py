@@ -62,7 +62,7 @@ def read_all_datasets() -> pd.DataFrame:
 
 
 print("read_processed_data()")
-def read_processed_data(augmented: bool = False, balanced: bool = True) -> tuple[pd.DataFrame, pd.DataFrame]:
+def read_processed_data(cross_domain: bool = True, augmented: bool = False, balanced: bool = True) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load preprocessed (and optionally augmented) data from the pipeline output.
 
     Args:
@@ -84,7 +84,9 @@ def read_processed_data(augmented: bool = False, balanced: bool = True) -> tuple
         (True,  True):  'balanced_augmented'
     }[(balanced, augmented)]
 
-    folder_path = os.path.join(f"../pipeline/{config['output']}", folder_name)
+    folder_attribute = "cross_domain" if cross_domain else "in_domain"
+
+    folder_path = os.path.join(f"../pipeline/{config['output']}", folder_attribute, folder_name)
 
     data_train = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
     data_test = pd.read_parquet(f"{folder_path}/preprocessed_data_test.parquet")
