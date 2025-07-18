@@ -8,7 +8,7 @@ import pandas as pd
 import argparse
 import os
 import torch
-import tqdm
+from tqdm import tqdm
 
 def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool = False, val_fraction: float = 0.1) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     train_data, val_data = get_dataset("train", val_fraction=val_fraction, cross_domain=cross_domain, augmented=augmented, balanced=balanced)
