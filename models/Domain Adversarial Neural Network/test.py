@@ -107,7 +107,9 @@ def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True
         log_file = f"{LOG_DIR}/results/{model_checkpoint.split('_acc')[0]}"
         with open(log_file, "w") as f:
             f.write(f"Summary of Test Run for model \n"
-                    f"  → {model_checkpoint} \n\n"
+                    f"  → {model_checkpoint} \n"
+                    f" in a {'cross-domain' if cross_domain else 'in-domain'} setting \n"
+                    f"  → {test_loader.dataset['domain'].unique().tolist() if cross_domain else NUM_DOMAINS} domains \n"
                     f"Classification Accuracy: {accuracy * 100:.2f}% \n"
                     f"Domain Accuracy: {domain_acc * 100:.2f}% \n"
                     f"F1 Score: {f1 * 100:.2f}% \n"
