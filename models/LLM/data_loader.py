@@ -22,13 +22,13 @@ def get_dataset(split: str =  "train",
     folder_path = os.path.join(f"pipeline/{config['output']}", folder_attribute, folder_name)
 
     if split.lower() in ("train", "tr", "validation", "val"):
-        data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet").sample(n=100)
+        data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
         split_idx = int(len(data) * (1 - val_fraction))
         dataset_train, dataset_val = data.iloc[:split_idx], data.iloc[split_idx:]
         return dataset_train, dataset_val
     
     elif split.lower() in ('test', 'tst'):
-        dataset_test = pd.read_parquet(f"{folder_path}/preprocessed_data_test.parquet").sample(n=50)
+        dataset_test = pd.read_parquet(f"{folder_path}/preprocessed_data_test.parquet")
         return dataset_test
     
     else:
