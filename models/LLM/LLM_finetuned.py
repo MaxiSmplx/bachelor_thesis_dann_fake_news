@@ -19,7 +19,7 @@ def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool 
 def tokenize_data(train_data, val_data, test_data) -> tuple[TensorDataset, TensorDataset, TensorDataset]:
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
-    train_enc = tokenizer(list(tqdm(train_data["text"].tolist(), desc="Tokenizing train data")), padding=True, truncation=True, return_tensors="pt")
+    train_enc = tokenizer(train_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
     val_enc = tokenizer(val_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
     test_enc = tokenizer(test_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
 
