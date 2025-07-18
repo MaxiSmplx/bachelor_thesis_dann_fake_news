@@ -8,6 +8,7 @@ import pandas as pd
 import argparse
 import os
 import torch
+import tqdm
 
 def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool = False, val_fraction: float = 0.1) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     train_data, val_data = get_dataset("train", val_fraction=val_fraction, cross_domain=cross_domain, augmented=augmented, balanced=balanced)
@@ -15,13 +16,10 @@ def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool 
 
     return train_data, val_data, test_data
 
-def tokenize(tokenizer, sample):
-    return tokenizer(sample['text'], truncation=True, padding='max_length', max_length=256)
-
 def tokenize_data(train_data, val_data, test_data) -> tuple[TensorDataset, TensorDataset, TensorDataset]:
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 
-    train_enc = tokenizer(train_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
+    train_enc = tokenizer(list(tqdm(train_data["text"].tolist(), desc="Tokenizing train data")), padding=True, truncation=True, return_tensors="pt")
     val_enc = tokenizer(val_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
     test_enc = tokenizer(test_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
 
