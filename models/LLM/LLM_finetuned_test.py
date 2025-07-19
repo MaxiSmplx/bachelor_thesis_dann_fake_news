@@ -24,8 +24,8 @@ def tokenize_data(test_data: pd.DataFrame) -> TensorDataset:
 
 
 def test(model_path: str, cross_domain: bool = True, augmented: bool = False, balanced: bool = False):
-    print(f"Loading model from: {model_path} ...")
-    model = BertForSequenceClassification.from_pretrained(model_path)
+    print(f"Loading model from: models/LLM/models/{model_path}...")
+    model = BertForSequenceClassification.from_pretrained(f"models/LLM/models/{model_path}")
 
     trainer = Trainer(model=model)
 
