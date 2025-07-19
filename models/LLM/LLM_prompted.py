@@ -13,12 +13,7 @@ import pandas as pd
 import argparse
 
 def get_data(cross_domain: bool = False, augmented: bool = False, balanced: bool = False):
-    train_data, val_data = get_dataset("train", val_fraction=0.1, cross_domain=cross_domain, augmented=augmented, balanced=balanced)
-    test_data = get_dataset("test", cross_domain=cross_domain, augmented=augmented, balanced=balanced)
-
-    data = pd.concat([train_data, val_data, test_data], ignore_index=True)
-
-    return data
+    return get_dataset("test", cross_domain=cross_domain, augmented=augmented, balanced=balanced)
 
 def prompt_gpt(data: pd.DataFrame, model: str) -> list[dict[str:str]]:
     prompts = [
