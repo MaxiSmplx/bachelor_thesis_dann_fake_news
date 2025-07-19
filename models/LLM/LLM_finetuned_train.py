@@ -8,7 +8,6 @@ import pandas as pd
 import argparse
 import os
 import torch
-from tqdm import tqdm
 
 def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool = False, val_fraction: float = 0.1) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     train_data, val_data = get_dataset("train", val_fraction=val_fraction, cross_domain=cross_domain, augmented=augmented, balanced=balanced)
@@ -51,8 +50,7 @@ def prepare_trainer(train_dataset, val_dataset, epochs: int = 10, batch_size: in
         per_device_eval_batch_size=batch_size,
         num_train_epochs=epochs,
         metric_for_best_model="accuracy",
-        logging_strategy="steps",
-        logging_steps=10,  
+        logging_strategy="epoch",
     )
 
     trainer = Trainer(
@@ -120,7 +118,6 @@ def train(
 
     trainer.save_model(f"models/LLM/models/BERT_{datetime.now().strftime('%Y%m%d-%H%M%S')}_{test_metrics['eval_accuracy'] * 100}")
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Finetune LLM model")
 
@@ -139,7 +136,6 @@ if __name__ == "__main__":
         augmented=args.augmented,
         balanced=args.balanced
     )
-
 
 
 

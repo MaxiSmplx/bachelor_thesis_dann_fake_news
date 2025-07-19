@@ -22,7 +22,7 @@ def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True
 
     test_loader = get_dataloader("test", cross_domain=cross_domain, balanced=balanced, augmented=augmented, batch_size=48)
     print(f"Loaded Test Data with {len(test_loader.dataset)} datapoints")
-    print(f"Testing on domain(s): {test_loader.dataset['domain'].unique().tolist()}") if cross_domain else print("Testing on all {NUM_DOMAINS} domains")
+    print(f"Testing on domain(s): {test_loader.dataset.df['domain'].unique().tolist()}") if cross_domain else print("Testing on all {NUM_DOMAINS} domains")
 
     num_classes = NUM_CLASSES
     num_domains = NUM_DOMAINS
@@ -109,7 +109,7 @@ def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True
             f.write(f"Summary of Test Run for model \n"
                     f"  → {model_checkpoint} \n"
                     f" in a {'cross-domain' if cross_domain else 'in-domain'} setting \n"
-                    f"  → {test_loader.dataset['domain'].unique().tolist() if cross_domain else NUM_DOMAINS} domains \n"
+                    f"  → {test_loader.dataset.df['domain'].unique().tolist() if cross_domain else NUM_DOMAINS} domains \n"
                     f"Classification Accuracy: {accuracy * 100:.2f}% \n"
                     f"Domain Accuracy: {domain_acc * 100:.2f}% \n"
                     f"F1 Score: {f1 * 100:.2f}% \n"

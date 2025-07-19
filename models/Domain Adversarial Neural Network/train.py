@@ -71,7 +71,7 @@ def train(
           f"    • Detected {(no_dom := len(train_loader.dataset.df['domain'].unique()))} domains \n"
           f"        • Ideal domain accuracy: {(1/no_dom)*100:.2f}% \n"
           f"    • Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
-          f"        • Training with {no_dom} domains and testing on {NUM_DOMAINS - no_dom} held-out domains"
+          f"        • Training with {no_dom} domains and testing on {NUM_DOMAINS - no_dom} held-out domain(s) \n"
           f"    • Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
           f"    • Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n"
           f"    • Using Tokenizer {TOKENIZER_NAME} \n"
