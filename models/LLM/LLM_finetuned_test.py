@@ -6,6 +6,7 @@ from torch.utils.data import TensorDataset
 import pandas as pd
 from data_loader import get_dataset, BERTDataset
 import os
+import argparse
 
 def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool = False) -> pd.DataFrame:
     test_data = get_dataset("test", cross_domain=cross_domain, augmented=augmented, balanced=balanced)
@@ -66,3 +67,21 @@ def test(model_path: str, cross_domain: bool = True, augmented: bool = False, ba
                 f"F1 Score: {f1 * 100:.2f}% \n"
                 f"Precision: {precision * 100:.2f}% \n"
                 f"Recall: {recall * 100:.2f}%")
+        
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Test finetuned LLM model")
+
+    parser.add_argument("--model", type=str, help="Model checkpoint")
+    parser.add_argument("--cross_domain", action="store_true", help="Test in cross-domain setting")
+    parser.add_argument("--augmented", action="store_true", help="Use augmented data")
+    parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
+
+    args = parser.parse_args()
+
+    test(
+        model_path=args.model,
+        cross_domain=args.cross_domain,
+        augmented=args.augmented,
+        balanced=args.balanced
+    )
