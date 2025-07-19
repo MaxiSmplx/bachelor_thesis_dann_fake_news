@@ -23,8 +23,15 @@ def get_dataset(split: str =  "train",
 
     if split.lower() in ("train", "tr", "validation", "val"):
         data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
-        split_idx = int(len(data) * (1 - val_fraction))
-        dataset_train, dataset_val = data.iloc[:split_idx], data.iloc[split_idx:]
+        
+        domains = data['domain'].unique()
+        val_domain_count = max(1, int(len(domains) * val_fraction))
+
+        val_domains = pd.Series(domains).sample(val_domain_count, random_state=42).tolist()
+
+        dataset_train = data[~data['domain'].isin(val_domains)]
+        dataset_val = data[data['domain'].isin(val_domains)]
+
         return dataset_train, dataset_val
     
     elif split.lower() in ('test', 'tst'):

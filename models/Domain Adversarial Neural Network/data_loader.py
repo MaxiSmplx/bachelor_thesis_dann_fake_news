@@ -5,7 +5,6 @@ from config import TOKENIZER, BATCH_SIZE
 
 tokenizer = TOKENIZER
 
-
 class ParquetDataset(Dataset):
     def __init__(self, df: pd.DataFrame):
         self.df = df
@@ -61,10 +60,18 @@ def get_dataloader(
 
     folder_path = os.path.join(f"pipeline/{config['output']}", folder_attribute, folder_name)
 
-    if split.lower() in ("train", "tr", "validation", "val"):
+    if split.lower() in ("train", "tr", "validation", "val"):     
         data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
-        split_idx = int(len(data) * (1 - val_fraction))
-        dataset_train, dataset_val = ParquetDataset(data.iloc[:split_idx]), ParquetDataset(data.iloc[split_idx:])
+
+        domains = data['domain'].unique()
+        val_domain_count = max(1, int(len(domains) * val_fraction))
+
+        val_domains = pd.Series(domains).sample(val_domain_count, random_state=42).tolist()
+
+        train_data = data[~data['domain'].isin(val_domains)]
+        val_data = data[data['domain'].isin(val_domains)]
+
+        dataset_train, dataset_val = ParquetDataset(train_data), ParquetDataset(val_data)
 
         loader_train = DataLoader(
             dataset_train,
