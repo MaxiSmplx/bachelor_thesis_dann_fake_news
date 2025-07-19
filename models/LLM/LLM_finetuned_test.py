@@ -41,9 +41,9 @@ def test(model_path: str, cross_domain: bool = True, augmented: bool = False, ba
     y_true = predictions.label_ids
 
     accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, pos_label="real")
-    recall = recall_score(y_true, y_pred, pos_label="real")
-    f1 = f1_score(y_true, y_pred, pos_label="real")
+    precision = precision_score(y_true, y_pred)
+    recall = recall_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred)
 
     print(
         f"\nEvaluation Metrics:\n"
