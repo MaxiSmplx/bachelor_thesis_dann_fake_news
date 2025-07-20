@@ -85,7 +85,7 @@ def train(
 
     output_folder_path = f"models/LLM/output/training_summary_{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
 
-    assert model_arch not in ("BERT", "RoBERTa"), "model should be 'BERT' or 'RoBERTa'"
+    assert model_arch in ("BERT", "RoBERTa"), "model should be 'BERT' or 'RoBERTa'"
 
     print("Loading data...")
     train_data, val_data, test_data = get_data(cross_domain=cross_domain, augmented=augmented, balanced=balanced)

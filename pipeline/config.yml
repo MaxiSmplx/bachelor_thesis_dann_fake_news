@@ -56,15 +56,18 @@ balance_data:
 
 test_set:
   # Whether to use a cross-domain testing setup
-  test_cross_domains: false
+  test_cross_domains: true
 
   # If cross-domain testing is enabled:
-  #   - If true, select held-out domains randomly
+  #   - If true, select n held-out domains (n_domains) randomly
   #   - If false, use the n domains (n_domains) with the fewest samples
   random_domains: false
 
-  # Number of domains to hold out for testing (used only if test_cross_domains is true and random_domains is false)
+  # Number of domains to hold out for testing (used only if test_cross_domains is true)
   n_domains: 1
+
+
+  manual_domains: true
 
   # Proportion of the dataset to use as test set
   # Only applicable if test_cross_domains is false
