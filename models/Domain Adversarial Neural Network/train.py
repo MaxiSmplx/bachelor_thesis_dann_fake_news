@@ -78,6 +78,7 @@ def train(
           f"    • Using Tokenizer {TOKENIZER_NAME} \n"
           f"Loaded Validation dataset with {len(val_loader.dataset)} datapoints... \n"
           f"    • {len(val_loader)} batches per epoch \n"
+          f"Total datapoints: {len(train_loader.dataset) + len(val_loader.dataset)}"
           f"Enabled Logging, to view Tensorboard logs call 'tensorboard --logdir={TENSORBOARD_DIR}'")
 
     # Model

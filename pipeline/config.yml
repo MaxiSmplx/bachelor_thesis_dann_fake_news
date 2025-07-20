@@ -66,8 +66,8 @@ test_set:
   # Number of domains to hold out for testing (used only if test_cross_domains is true)
   n_domains: 1
 
-
-  manual_domains: true
+  use_manual_domains: true
+  manual_domains: ["Crime & Public Safety"]
 
   # Proportion of the dataset to use as test set
   # Only applicable if test_cross_domains is false

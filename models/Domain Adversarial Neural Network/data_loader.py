@@ -63,13 +63,28 @@ def get_dataloader(
     if split.lower() in ("train", "tr", "validation", "val"):     
         data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
 
-        domains = data['domain'].unique()
-        val_domain_count = max(1, int(len(domains) * val_fraction))
+        if folder_attribute == "cross_domain":
+            domains = data['domain'].unique()
+            val_domain_count = max(1, int(len(domains) * val_fraction))
 
-        val_domains = pd.Series(domains).sample(val_domain_count, random_state=42).tolist()
+            val_domains = pd.Series(domains).sample(val_domain_count, random_state=42).tolist()
 
-        train_data = data[~data['domain'].isin(val_domains)]
-        val_data = data[data['domain'].isin(val_domains)]
+            train_data = data[~data['domain'].isin(val_domains)]
+            val_data = data[data['domain'].isin(val_domains)]
+        else:
+            train_data = []
+            val_data = []
+
+            grouped = data.groupby("domain")
+            for domain, group in grouped:
+                val_split = group.sample(int(len(group) * val_fraction), random_state=42)
+                train_split = group.drop(val_split.index)
+
+                val_data.append(val_split)
+                train_data.append(train_split)
+
+            train_data = pd.concat(train_data).reset_index(drop=True)
+            val_data = pd.concat(val_data).reset_index(drop=True)
 
         dataset_train, dataset_val = ParquetDataset(train_data), ParquetDataset(val_data)
 
