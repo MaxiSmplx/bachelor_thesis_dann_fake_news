@@ -1,4 +1,5 @@
 from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from transformers import Trainer, TrainingArguments
 from torch.utils.data import TensorDataset
 from data_loader import get_dataset, BERTDataset
@@ -15,8 +16,11 @@ def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool 
 
     return train_data, val_data, test_data
 
-def tokenize_data(train_data, val_data, test_data) -> tuple[TensorDataset, TensorDataset, TensorDataset]:
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+def tokenize_data(train_data: pd.DataFrame, val_data: pd.DataFrame, test_data: pd.DataFrame, model_arch: str = "BERT") -> tuple[TensorDataset, TensorDataset, TensorDataset]:
+    if model_arch == "BERT":
+        tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    elif model_arch == "RoBERTa":
+        tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
 
     train_enc = tokenizer(train_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
     val_enc = tokenizer(val_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
@@ -39,8 +43,12 @@ def compute_metrics(pred):
         "accuracy": accuracy_score(labels, preds)
     }
 
-def prepare_trainer(train_dataset, val_dataset, epochs: int = 10, batch_size: int = 48) -> Trainer:
-    model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+def prepare_trainer(train_dataset, val_dataset, epochs: int = 10, batch_size: int = 48, model_arch: str = "BERT") -> Trainer:
+    if model_arch == "BERT":
+        model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+    elif model_arch == "RoBERTa":
+        model = RobertaForSequenceClassification.from_pretrained("roberta-base", num_labels=2)
+
 
     training_args = TrainingArguments(
         output_dir="models/LLM/results",
@@ -68,13 +76,16 @@ def train(
     num_epochs: int = 10,
     cross_domain: bool = True,
     augmented: bool = False,
-    balanced: bool = False):
+    balanced: bool = False,
+    model_arch: str = "BERT"):
     if not os.path.isdir("models/LLM/output"):
         os.mkdir("models/LLM/output")
     if not os.path.isdir("models/LLM/models"):
         os.mkdir("models/LLM/models")
 
     output_folder_path = f"models/LLM/output/training_summary_{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
+
+    assert model_arch not in ("BERT", "RoBERTa"), "model should be 'BERT' or 'RoBERTa'"
 
     print("Loading data...")
     train_data, val_data, test_data = get_data(cross_domain=cross_domain, augmented=augmented, balanced=balanced)
@@ -92,10 +103,10 @@ def train(
         )
 
     print("Tokenizing data...")
-    train_dataset, val_dataset, test_dataset = tokenize_data(train_data, val_data, test_data)
+    train_dataset, val_dataset, test_dataset = tokenize_data(train_data, val_data, test_data, model_arch)
 
     print("Preparing trainer...")
-    trainer = prepare_trainer(train_dataset, val_dataset, epochs=num_epochs, batch_size=batch_size)
+    trainer = prepare_trainer(train_dataset, val_dataset, epochs=num_epochs, batch_size=batch_size, model_arch=model_arch)
 
     print("Starting training...")
     trainer.train()
@@ -116,7 +127,7 @@ def train(
 
     print(f"Final Test Accuracy: {test_metrics['eval_accuracy'] * 100}%")
 
-    trainer.save_model(f"models/LLM/models/BERT_{datetime.now().strftime('%Y%m%d-%H%M%S')}_{test_metrics['eval_accuracy'] * 100}")
+    trainer.save_model(f"models/LLM/models/{model_arch}_{datetime.now().strftime('%Y%m%d-%H%M%S')}_{test_metrics['eval_accuracy'] * 100}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Finetune LLM model")
@@ -126,6 +137,7 @@ if __name__ == "__main__":
     parser.add_argument("--cross_domain", action="store_true", help="Train in cross-domain setting")
     parser.add_argument("--augmented", action="store_true", help="Use augmented data")
     parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
+    parser.add_argument("--model", type=str, default="BERT", help="BERT variant - BERT or RoBERTa")
 
     args = parser.parse_args()
 
@@ -134,7 +146,8 @@ if __name__ == "__main__":
         num_epochs=args.epochs,
         cross_domain=args.cross_domain,
         augmented=args.augmented,
-        balanced=args.balanced
+        balanced=args.balanced,
+        model_arch=args.model
     )
 
 

@@ -74,6 +74,8 @@ def process_results(responses: list[dict[str:str]], no_samples: int) -> tuple[li
 def run(cross_domain: bool = False, balanced: bool = False, augmented: bool = False, no_samples: int = 1000, model: str = "gpt-4.1-nano-2025-04-14"):
     data = get_data(cross_domain=cross_domain, balanced=balanced, augmented=augmented).sample(n=no_samples)
 
+    print(f"Using gpt-model: {model}")
+
     responses = prompt_gpt(data, model)
 
     y_true, y_pred = process_results(responses, no_samples)
