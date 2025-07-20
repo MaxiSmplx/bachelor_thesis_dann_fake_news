@@ -94,7 +94,7 @@ def train(
         f.write(
             f"Training Details \n"
             f"  Training Data: {len(train_data)} data points, {len(train_data['domain'].unique())} domains \n"
-            f"  Evaluation Data: {len(val_data)}, {len(test_data["domain"].unique())} domain(s) \n"
+            f"  Evaluation Data: {len(val_data)}, {len(test_data['domain'].unique())} domain(s) \n"
             f"  Test Data: {len(test_data)}, {len(test_data['domain'].unique())} domain(s) \n"
             f"  Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
             f"      {test_data['domain'].unique().tolist() if cross_domain else len(test_data['domain'].unique())} domain(s) \n"
