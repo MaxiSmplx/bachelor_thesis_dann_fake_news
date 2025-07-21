@@ -67,6 +67,10 @@ def process_results(responses: list[dict[str:str]], no_samples: int) -> tuple[li
         print("Successfully labeled all samples provided")
     else:
         print(f"ERROR: Only labeled {no_samples - sum(item not in {'real', 'fake'} for item in y_pred)} / {no_samples} samples correctly")
+        wrong_indices = [i for i, item in enumerate(y_pred) if item not in ("real", "fake")]
+
+        y_pred = [val for i, val in enumerate(y_pred) if i not in wrong_indices]
+        y_true = [val for i, val in enumerate(y_true) if i not in wrong_indices]
 
     return y_true, y_pred
 

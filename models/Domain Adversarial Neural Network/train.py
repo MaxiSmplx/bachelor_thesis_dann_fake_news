@@ -77,7 +77,6 @@ def train(
           f"Total datapoints: {len(train_loader.dataset) + len(val_loader.dataset)} \n"
           f"Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
           f"    • Validating performance on {(val_no_dom := len(val_loader.dataset.df['domain'].unique()))} domain(s) \n"
-          f"    • Training with {no_dom} domains and testing on {NUM_DOMAINS - no_dom + val_no_dom} domain(s) \n"
           f"Enabled Logging, to view Tensorboard logs call 'tensorboard --logdir={TENSORBOARD_DIR}'")
 
     # Model

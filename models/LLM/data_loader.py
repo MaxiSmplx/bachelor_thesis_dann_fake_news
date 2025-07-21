@@ -30,8 +30,8 @@ def get_dataset(split: str =  "train",
 
             val_domains = pd.Series(domains).sample(val_domain_count, random_state=42).tolist()
 
-            train_data = data[~data['domain'].isin(val_domains)]
-            val_data = data[data['domain'].isin(val_domains)]
+            dataset_train = data[~data['domain'].isin(val_domains)]
+            dataset_val = data[data['domain'].isin(val_domains)]
         else:
             train_data = []
             val_data = []
