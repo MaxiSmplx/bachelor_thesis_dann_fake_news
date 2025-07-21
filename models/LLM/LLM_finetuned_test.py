@@ -1,4 +1,5 @@
 from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import RobertaTokenizer, RobertaForSequenceClassification
 from transformers import Trainer
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import torch
@@ -12,8 +13,11 @@ def get_data(cross_domain: bool = True, augmented: bool = False, balanced: bool 
     test_data = get_dataset("test", cross_domain=cross_domain, augmented=augmented, balanced=balanced)
     return test_data
 
-def tokenize_data(test_data: pd.DataFrame) -> TensorDataset:
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+def tokenize_data(test_data: pd.DataFrame, model_arch: str) -> TensorDataset:
+    if model_arch == "BERT":
+        tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    elif model_arch == "RoBERTa":
+        tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
 
     test_enc = tokenizer(test_data["text"].tolist(), padding=True, truncation=True, return_tensors="pt")
 
@@ -26,14 +30,17 @@ def tokenize_data(test_data: pd.DataFrame) -> TensorDataset:
 
 def test(model_path: str, cross_domain: bool = True, augmented: bool = False, balanced: bool = False):
     print(f"Loading model from: models/LLM/models/{model_path}...")
-    model = BertForSequenceClassification.from_pretrained(f"models/LLM/models/{model_path}")
+    if model_path.split('_', 1)[0] == "BERT":
+        model = BertForSequenceClassification.from_pretrained(f"models/LLM/models/{model_path}")
+    elif model_path.split('_', 1)[0] == "RoBERTa":
+        model = RobertaForSequenceClassification.from_pretrained(f"models/LLM/models/{model_path}")
 
     trainer = Trainer(model=model)
 
     test_data = get_data(cross_domain=cross_domain, augmented=augmented, balanced=balanced)
 
     print("Tokenizing test data...")
-    test_dataset = tokenize_data(test_data)
+    test_dataset = tokenize_data(test_data, model_arch=model_path.split('_', 1)[0])
 
     print("Running evaluation...")
     predictions = trainer.predict(test_dataset)

@@ -64,21 +64,20 @@ def train(
                             batch_size=batch_size, 
                             shuffle=True, 
                             num_workers=4)
-
+    
     print(f"Loaded Train dataset with {len(train_loader.dataset)} datapoints... \n"
-          f"    • Configured batch size: {train_loader.batch_size} \n"
-          f"    • {len(train_loader)} batches per epoch \n"
+          f"    • Configured batch size: {train_loader.batch_size} => {len(train_loader)} batches per epoch \n"
           f"    • Detected {(no_dom := len(train_loader.dataset.df['domain'].unique()))} domains for training \n"
           f"        • Ideal domain accuracy: {(1/no_dom)*100:.2f}% \n"
-          f"    • Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
-          f"        • Validating performance on {(val_no_dom := len(val_loader.dataset.df['domain'].unique()))} domain(s) \n"
-          f"        • Training with {no_dom} domains and testing on {NUM_DOMAINS - no_dom + val_no_dom} held-out domain(s) \n"
           f"    • Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
           f"    • Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n"
           f"    • Using Tokenizer {TOKENIZER_NAME} \n"
           f"Loaded Validation dataset with {len(val_loader.dataset)} datapoints... \n"
           f"    • {len(val_loader)} batches per epoch \n"
-          f"Total datapoints: {len(train_loader.dataset) + len(val_loader.dataset)}"
+          f"Total datapoints: {len(train_loader.dataset) + len(val_loader.dataset)} \n"
+          f"Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
+          f"    • Validating performance on {(val_no_dom := len(val_loader.dataset.df['domain'].unique()))} domain(s) \n"
+          f"    • Training with {no_dom} domains and testing on {NUM_DOMAINS - no_dom + val_no_dom} domain(s) \n"
           f"Enabled Logging, to view Tensorboard logs call 'tensorboard --logdir={TENSORBOARD_DIR}'")
 
     # Model
@@ -127,8 +126,8 @@ def train(
             f.write(f"=== Run Configuration === \n\n"
                     f"  Tokenizer: {TOKENIZER_NAME} \n"
                     f"  Training in {'cross-domain' if cross_domain else 'in-domain'} setting \n"
-                    f"      Training on {no_dom} domains and validating on {val_no_dom} domain(s)"
-                    f"          => {val_loader.dataset.df['domain'].unique().tolist()}"
+                    f"      Training on {no_dom} domains and validating on {val_no_dom} domain(s) \n"
+                    f"          => {val_loader.dataset.df['domain'].unique().tolist()} \n"
                     f"  Data Augmentation is {'enabled' if augmented else 'disabled'} \n"
                     f"  Domain and Class balancing is {'enabled' if balanced else 'disabled'} \n"
                     f"  Batch Size: {batch_size} \n"

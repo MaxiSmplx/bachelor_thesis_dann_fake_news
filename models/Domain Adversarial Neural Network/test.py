@@ -22,7 +22,7 @@ def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True
 
     test_loader = get_dataloader("test", cross_domain=cross_domain, balanced=balanced, augmented=augmented, batch_size=48)
     print(f"Loaded Test Data with {len(test_loader.dataset)} datapoints")
-    print(f"Testing on domain(s): {test_loader.dataset.df['domain'].unique().tolist()}") if cross_domain else print("Testing on all {NUM_DOMAINS} domains")
+    print(f"Testing on domain(s): {test_loader.dataset.df['domain'].unique().tolist()}") if cross_domain else print(f"Testing on all {NUM_DOMAINS} domains")
 
     num_classes = NUM_CLASSES
     num_domains = NUM_DOMAINS
