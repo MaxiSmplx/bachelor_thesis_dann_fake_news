@@ -294,8 +294,8 @@ def train(
 
         print(f"🔍Epoch {epoch}/{num_epochs} Validation summary: "
               f"Class-Loss: {avg_val_c_loss:.4f} | "
-              f"Accuracy: {val_acc:.2f}% | "
-              f"Domain Accuracy: {val_domain_acc:.2f if not cross_domain else 'cross-domain: untracked'}%\n")
+              f"Accuracy: {val_acc:.2f}% \n"
+        )
 
 
         epoch_times.append((perf_counter() - start_epoch_time) / 60)
