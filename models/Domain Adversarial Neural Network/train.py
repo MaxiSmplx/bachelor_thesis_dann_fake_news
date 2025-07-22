@@ -295,7 +295,7 @@ def train(
         print(f"🔍Epoch {epoch}/{num_epochs} Validation summary: "
               f"Class-Loss: {avg_val_c_loss:.4f} | "
               f"Accuracy: {val_acc:.2f}% | "
-              f"Domain Accuracy: {val_domain_acc:.2f}%\n")
+              f"Domain Accuracy: {val_domain_acc:.2f if not cross_domain else 'cross-domain: untracked'}%\n")
 
 
         epoch_times.append((perf_counter() - start_epoch_time) / 60)
@@ -346,7 +346,7 @@ def train(
             }, epoch)
 
         # save if its the best model
-        if val_acc > best_val_acc + 0.1:
+        if val_acc > best_val_acc:
             best_val_acc = val_acc
             es_epochs_no_improve = 0
 
