@@ -38,7 +38,7 @@ BATCH_SIZE = 48
 NUM_EPOCHS = 20
 
 # Gradient Reversal Layer schedule
-GRL_LAMBDA_CEILING= 0.85
+GRL_LAMBDA_CEILING = 1
 GRL_WARMUP = 0.0
 
 # Model
