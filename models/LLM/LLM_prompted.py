@@ -11,6 +11,8 @@ from sklearn.metrics import (
 import os
 import pandas as pd
 import argparse
+from datetime import datetime
+from time import perf_counter
 
 def get_data(cross_domain: bool = False, augmented: bool = False, balanced: bool = False):
     return get_dataset("test", cross_domain=cross_domain, augmented=augmented, balanced=balanced)
@@ -76,11 +78,46 @@ def process_results(responses: list[dict[str:str]], no_samples: int) -> tuple[li
 
 
 def run(cross_domain: bool = False, balanced: bool = False, augmented: bool = False, no_samples: int = 1000, model: str = "gpt-4.1-nano-2025-04-14"):
-    data = get_data(cross_domain=cross_domain, balanced=balanced, augmented=augmented).sample(n=no_samples)
+    data_raw = get_data(cross_domain=cross_domain, balanced=balanced, augmented=augmented)
+
+    data = data_raw.sample(n=no_samples)
 
     print(f"Using gpt-model: {model}")
 
+    inference_costs = {
+        "gpt-4.1-nano-2025-04-14": (0.1, 0.4),
+        "gpt-4.1-2025-04-14": (2, 8),
+        "gpt-4o-mini-2024-07-18": (0.15, 0.6)
+    }
+
+    if not os.path.isdir(f"models/LLM/output/{model}"):
+        os.makedirs(f"models/LLM/output/{model}")
+
+    log_output_file = f"models/LLM/output/{model}/training_summary_{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
+
+    with open(log_output_file,"a") as f:
+        f.write(
+            f"Training Summary for {model} \n"
+            f"Settings: \n"
+            f"  {'cross-domain' if cross_domain else 'in-domain'} \n"
+            f"  {'balanced' if balanced else 'unbalanced'} \n"
+            f"  {'augmented' if augmented else 'not-augmented'} \n"
+            f"  original test dataset length: {len(data_raw)} \n"
+        )
+
+    if model in inference_costs.keys():
+        avg_tokens = data['text'].apply(len).mean() * 0.75
+        cost_test_data = inference_costs[model][0] / 1_000_000 * avg_tokens
+        cost_prompt = inference_costs[model][0] / 1_000_000 * (65 * 0.75)
+        output_cost = inference_costs[model][1] / 1_000_000 * (4 * 0.75)
+        with open(log_output_file,"a") as f:
+            f.write(
+                f"  approx total cost: ${(cost_test_data + cost_prompt + output_cost) * no_samples:.4f} \n"
+            )
+
+    start_time = perf_counter()
     responses = prompt_gpt(data, model)
+    inference_time = perf_counter() - start_time
 
     y_true, y_pred = process_results(responses, no_samples)
 
@@ -97,6 +134,18 @@ def run(cross_domain: bool = False, balanced: bool = False, augmented: bool = Fa
         f"Recall   : {recall:.4f}\n"
         f"F1 Score : {f1:.4f}\n"
     )
+
+    with open(log_output_file ,"a") as f:
+        f.write(
+            f"  samples configured: {no_samples} -> samples classified: {len(y_pred)} \n"
+            f"Inference time: {inference_time:.2f} seconds \n\n"
+            f"\nEvaluation Metrics:\n"
+            f"---------------------------\n"
+            f"Accuracy : {accuracy:.4f}\n"
+            f"Precision: {precision:.4f}\n"
+            f"Recall   : {recall:.4f}\n"
+            f"F1 Score : {f1:.4f}\n"
+        )
 
 
 if __name__ == "__main__":

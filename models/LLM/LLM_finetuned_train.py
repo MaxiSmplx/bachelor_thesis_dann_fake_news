@@ -78,12 +78,12 @@ def train(
     augmented: bool = False,
     balanced: bool = False,
     model_arch: str = "BERT"):
-    if not os.path.isdir("models/LLM/output"):
-        os.mkdir("models/LLM/output")
+    if not os.path.isdir(f"models/LLM/output/{model_arch}"):
+        os.mkdir(f"models/LLM/output/{model_arch}")
     if not os.path.isdir("models/LLM/models"):
         os.mkdir("models/LLM/models")
 
-    output_folder_path = f"models/LLM/output/training_summary_{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
+    output_folder_path = f"models/LLM/output/{model_arch}/training_summary_{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
 
     assert model_arch in ("BERT", "RoBERTa"), "model should be 'BERT' or 'RoBERTa'"
 

@@ -13,12 +13,13 @@ TOKENIZERS = {
     "MiniL6": "sentence-transformers/all-MiniLM-L6-v2",
     "MiniL12": "sentence-transformers/all-MiniLM-L12-v2",
     "mpnet": "sentence-transformers/all-mpnet-base-v2",
-    "roberta": "sentence-transformers/all-distilroberta-v1"
+    "roberta": "sentence-transformers/all-distilroberta-v1",
+    "bert": "bert-base-uncased"
 }
 
 
 # Data Loading
-TOKENIZER_NAME = TOKENIZERS["MiniL6"]
+TOKENIZER_NAME = TOKENIZERS["bert"]
 TOKENIZER = AutoTokenizer.from_pretrained(TOKENIZER_NAME, use_fast=True)
 FOLDER_PATH_RAW = "pipeline/output/raw"
 FOLDER_PATH_AUGMENTED = "pipeline/output/augmented"
