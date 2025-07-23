@@ -14,7 +14,7 @@ from config import (
     LOG_DIR
 )
 
-def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True, balanced: bool = False, augmented: bool = True):
+def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True, balanced: bool = False, augmented: bool = True) -> dict[str: float]:
     print(f"\n🚀 Starting evaluation...\n")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
@@ -115,6 +115,13 @@ def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True
                     f"F1 Score: {f1 * 100:.2f}% \n"
                     f"Precision: {precision * 100:.2f}% \n"
                     f"Recall: {recall * 100:.2f}%")
+    
+    return {
+        "Accuracy": accuracy,
+        "Precision": precision,
+        "Recall": recall,
+        "F1 Score": f1
+    }
             
 
 if __name__ == "__main__":

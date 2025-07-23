@@ -41,7 +41,7 @@ def train(
     cross_domain: bool = True,
     augmented: bool = False,
     balanced: bool = False,
-):
+) -> str:
     print("\n🚀 Starting training run...")
 
     # Device
@@ -363,6 +363,8 @@ def train(
     if logging:
         writer.close()
     print(f"Training complete. Best weights found achieved accuracy of {best_val_acc:.2f}%.")
+
+    return best_model_path
 
 
 if __name__ == "__main__":
