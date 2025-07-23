@@ -19,7 +19,7 @@ TOKENIZERS = {
 
 
 # Data Loading
-TOKENIZER_NAME = TOKENIZERS["bert"]
+TOKENIZER_NAME = TOKENIZERS["MiniL6"]
 TOKENIZER = AutoTokenizer.from_pretrained(TOKENIZER_NAME, use_fast=True)
 FOLDER_PATH_RAW = "pipeline/output/raw"
 FOLDER_PATH_AUGMENTED = "pipeline/output/augmented"
@@ -38,7 +38,7 @@ BATCH_SIZE = 48
 NUM_EPOCHS = 20
 
 # Gradient Reversal Layer schedule
-GRL_LAMBDA_CEILING = 1
+GRL_LAMBDA_CEILING = 1.2
 GRL_WARMUP = 0.0
 
 # Model

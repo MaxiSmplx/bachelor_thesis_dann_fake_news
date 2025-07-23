@@ -82,6 +82,8 @@ def train(
         os.mkdir(f"models/LLM/output/{model_arch}")
     if not os.path.isdir("models/LLM/models"):
         os.mkdir("models/LLM/models")
+    print(f"Started training... \n" 
+          f"Training with model: {model_arch} \n")
 
     output_folder_path = f"models/LLM/output/{model_arch}/training_summary_{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt"
 
@@ -114,6 +116,7 @@ def train(
     print("Evaluating on test dataset...")
     test_metrics = trainer.evaluate(eval_dataset=test_dataset)
 
+    print(f"Saving results to {output_folder_path}...")
     with open(output_folder_path, "a") as f:
         f.write("===== Training Log Summary =====\n")
         for entry in trainer.state.log_history:
@@ -149,9 +152,3 @@ if __name__ == "__main__":
         balanced=args.balanced,
         model_arch=args.model
     )
-
-
-
-
-
-

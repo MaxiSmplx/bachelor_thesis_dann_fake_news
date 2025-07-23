@@ -112,8 +112,9 @@ def run(cross_domain: bool = False, balanced: bool = False, augmented: bool = Fa
         output_cost = inference_costs[model][1] / 1_000_000 * (4 * 0.75)
         with open(log_output_file,"a") as f:
             f.write(
-                f"  approx total cost: ${(cost_test_data + cost_prompt + output_cost) * no_samples:.4f} \n"
+                f"  approx total cost: ${(total_costs := (cost_test_data + cost_prompt + output_cost) * no_samples):.4f} \n"
             )
+        print(f"Approximated total costs: ${total_costs:.4f}")
 
     start_time = perf_counter()
     responses = prompt_gpt(data, model)
@@ -122,7 +123,7 @@ def run(cross_domain: bool = False, balanced: bool = False, augmented: bool = Fa
     y_true, y_pred = process_results(responses, no_samples)
 
     accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, pos_label="real")
+    precision = precision_score(y_true, y_pred, pos_label="real", zero_division=0)
     recall = recall_score(y_true, y_pred, pos_label="real")
     f1 = f1_score(y_true, y_pred, pos_label="real")
 
@@ -155,7 +156,7 @@ if __name__ == "__main__":
     parser.add_argument("--augmented", action="store_true", help="Use augmented data")
     parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
     parser.add_argument("--model", type=str, default="gpt-4.1-nano-2025-04-14", help="GPT Model name")
-    parser.add_argument("--samples", type=int, help="Number of samples to use")
+    parser.add_argument("--samples", type=int, default=100, help="Number of samples to use")
 
     args = parser.parse_args()
 

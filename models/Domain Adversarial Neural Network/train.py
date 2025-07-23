@@ -240,8 +240,6 @@ def train(
         val_class_losses = np.empty(len(val_loader))
         val_correct = 0
         val_total = 0
-        val_domain_correct = 0
-        val_domain_total = 0
         val_all_preds = []
         val_all_labels = []
 
@@ -272,10 +270,6 @@ def train(
                 val_correct += (preds == true_labels).sum().item()
                 val_total += true_labels.size(0)
 
-                domain_preds = domain_logits.argmax(dim=1)
-                val_domain_correct += (domain_preds == y_dom.to(device)).sum().item()
-                val_domain_total += y_dom.size(0)
-
                 batch_acc = (preds == true_labels).sum().item() / y_lab.size(0)
                 if (val_batch_idx+1) % progress_treshold_val == 0:
                     print(f"  → [Validation] Processing batch {val_batch_idx+1}/{len(val_loader)} ")
@@ -284,7 +278,6 @@ def train(
 
         avg_val_c_loss = np.mean(val_class_losses)
         val_acc = val_correct / val_total * 100
-        val_domain_acc = val_domain_correct / val_domain_total * 100
 
         val_all_preds = np.array(val_all_preds)
         val_all_labels = np.array(val_all_labels)
