@@ -4,6 +4,8 @@ from test import test
 import os
 from datetime import datetime
 import argparse
+import yaml
+import pandas as pd
 
 
 def find_best_model(
@@ -18,6 +20,23 @@ def find_best_model(
     output_file_path = f"{output_folder_path}/{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"
     if not os.path.isdir(output_folder_path):
         os.makedirs(output_folder_path)
+    
+    with open("pipeline/config.yml", "r") as f:
+        config = yaml.safe_load(f)
+    data_folder_name = {
+        (False, False): 'raw',
+        (True,  False): 'balanced',
+        (False, True):  'augmented',
+        (True,  True):  'balanced_augmented'
+    }[(balanced, augmented)]
+    data_folder_attribute = "cross_domain" if cross_domain else "in_domain"
+    data_folder_path = os.path.join(f"pipeline/{config['output']}", data_folder_attribute, data_folder_name)
+    test_data = pd.read_parquet(f"{data_folder_path}/preprocessed_data_test.parquet")
+    with open(output_file_path, "a") as f:
+        f.write(
+            f"Training in a {'cross-domain' if cross_domain else 'in-domain'} setting \n"
+            f"  Testing on domain(s): {test_data['domain'].unique().tolist()} \n\n\n"
+        )
 
     best_acc = 0.0
 
