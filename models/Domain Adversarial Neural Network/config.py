@@ -28,7 +28,7 @@ FOLDER_PATH_BALANCED_AUGMENTED = "pipeline/output/balanced_augmented"
 
 # Model architecture
 INPUT_DIM = AutoConfig.from_pretrained(TOKENIZER_NAME).hidden_size
-FEATURE_DIM = 128 
+FEATURE_DIM = 256 
 NUM_CLASSES = 1
 NUM_DOMAINS = config["domain_tagging"]["n_domains"]
 
@@ -38,8 +38,8 @@ BATCH_SIZE = 48
 NUM_EPOCHS = 20
 
 # Gradient Reversal Layer schedule
-GRL_LAMBDA_CEILING = 1.2
-GRL_WARMUP = 0.0
+GRL_LAMBDA_CEILING = 1.0
+GRL_WARMUP = 0.2
 
 # Model
 CHECKPOINT_DIR = "models/Domain Adversarial Neural Network/checkpoints"

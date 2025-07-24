@@ -59,6 +59,8 @@ class FeatureExtractor(nn.Module):
 class LabelPredictor(nn.Module):
     def __init__(self, feature_dim, num_classes):
         super(LabelPredictor, self).__init__()
+        # Dropout
+        self.dropout = nn.Dropout(0.4)
         # Fully Connected Layer
         self.classifier = nn.Linear(feature_dim, num_classes)
 
