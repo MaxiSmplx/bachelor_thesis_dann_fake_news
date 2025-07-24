@@ -37,35 +37,33 @@ class FeatureExtractor(nn.Module):
             nn.Linear(input_dim, 512),
             nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
-            nn.Dropout(0.25),
+            nn.Dropout(0.4),
             nn.Linear(512, feature_dim),
             nn.BatchNorm1d(feature_dim),
             nn.ReLU(inplace=True),
         )
 
     def forward(self, input_ids, attention_mask):
-        outputs = self.encoder(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            return_dict=True
-        )
-        pooled = outputs.pooler_output
+        outputs = self.encoder(input_ids=input_ids,
+                               attention_mask=attention_mask,
+                               return_dict=True)
+        token_embeddings = outputs.last_hidden_state
+        mask = attention_mask.unsqueeze(-1).float()
+        pooled = (token_embeddings * mask).sum(1) / mask.sum(1).clamp(min=1e-9)
 
-        features = self.feature(pooled)
-
-        return features
+        return self.feature(pooled)
     
 
 class LabelPredictor(nn.Module):
     def __init__(self, feature_dim, num_classes):
         super(LabelPredictor, self).__init__()
         # Dropout
-        self.dropout = nn.Dropout(0.4)
+        self.dropout = nn.Dropout(0.5)
         # Fully Connected Layer
         self.classifier = nn.Linear(feature_dim, num_classes)
 
     def forward(self, features):
-        return self.classifier(features)
+        return self.classifier(self.dropout(features))
     
 
 class DomainClassifier(nn.Module):
@@ -79,7 +77,7 @@ class DomainClassifier(nn.Module):
             # Activation Function
             nn.ReLU(inplace=True),
             # Dropout Layer: Zeroes x% of activations during training
-            nn.Dropout(0.4),
+            nn.Dropout(0.5),
             # Fully Connected Layer
             nn.Linear(64, num_domains)
         )
