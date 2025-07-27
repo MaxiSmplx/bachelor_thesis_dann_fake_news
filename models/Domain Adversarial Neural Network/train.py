@@ -146,6 +146,7 @@ def train(
     progress_treshold_train = max(1, len(train_loader) // 10)
     progress_treshold_val = max(1, len(val_loader) // 5)
 
+    training_time_start = perf_counter()
     for epoch in range(1, num_epochs + 1):
         if device.type == "mps":
             torch.mps.empty_cache()
@@ -361,6 +362,8 @@ def train(
                 break
     
     if logging:
+        with open(log_file, "a") as f:
+            f.write(f"Training time: {perf_counter() - training_time_start} \n")
         writer.close()
     print(f"Training complete. Best weights found achieved accuracy of {best_val_acc:.2f}%.")
 

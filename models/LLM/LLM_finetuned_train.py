@@ -5,6 +5,7 @@ from torch.utils.data import TensorDataset
 from data_loader import get_dataset, BERTDataset
 from sklearn.metrics import accuracy_score
 from datetime import datetime
+from time import perf_counter
 import pandas as pd
 import argparse
 import os
@@ -111,7 +112,10 @@ def train(
     trainer = prepare_trainer(train_dataset, val_dataset, epochs=num_epochs, batch_size=batch_size, model_arch=model_arch)
 
     print("Starting training...")
+    training_time_start = perf_counter()
     trainer.train()
+    with open(output_folder_path, "a") as f:
+        f.write(f"Training time: {perf_counter() - training_time_start}")
 
     print("Evaluating on test dataset...")
     test_metrics = trainer.evaluate(eval_dataset=test_dataset)
