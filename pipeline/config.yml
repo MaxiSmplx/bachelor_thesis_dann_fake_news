@@ -27,7 +27,7 @@ augmentation:
 
   # Total number of augmentation requests to send to the OpenAI API per augmentation technique
   # Note: Average cost per 1000 requests is ~$0.18 (based on GPT-4.1 Nano pricing)
-  augmentation_budget: 5000
+  augmentation_budget: 2000
 
   # Strategy for distributing augmentation across domains
   methods:
@@ -67,7 +67,7 @@ test_set:
   n_domains: 1
 
   use_manual_domains: true
-  manual_domains: ["Crime & Public Safety"]
+  manual_domains: ["Government Policy & Public Affairs"]
 
   # Proportion of the dataset to use as test set
   # Only applicable if test_cross_domains is false
