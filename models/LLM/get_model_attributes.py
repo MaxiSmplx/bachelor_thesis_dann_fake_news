@@ -1,15 +1,10 @@
 import pandas as pd
-from config import (
-    NUM_CLASSES,
-    NUM_DOMAINS,
-    INPUT_DIM,
-    FEATURE_DIM
-)
-from model import DANN
-from test import test
+from LLM_finetuned_test import test
 import torch
 import os
 from time import perf_counter
+from transformers import BertForSequenceClassification
+from transformers import RobertaForSequenceClassification
 import argparse
 import yaml
 
@@ -29,9 +24,13 @@ def get_data(cross_domain: bool, balanced: bool, augmented: bool):
 def get_param_count(model):
     return sum(p.numel() for p in model.parameters())
 
-def get_model_size(model):
-    file_size_bytes = os.path.getsize(model)
-    return file_size_bytes / (1024 ** 2) #in MB
+def get_model_size(folder_path):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(folder_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size / (1024 ** 2)  # MB
 
 def get_model_size_in_ram(model, dtype=torch.float32):
     param_count = get_param_count(model)
@@ -64,20 +63,15 @@ def get_attributes(model_checkpoint: str, cross_domain: bool, augmented: bool, b
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
     print(f"Using device >> {device}\n")
 
-    model_path = f"models/Domain Adversarial Neural Network/checkpoints/{model_checkpoint}.pt"
-
-
-    model = DANN(
-    input_dim=INPUT_DIM,
-    feature_dim=FEATURE_DIM,
-    num_classes=NUM_CLASSES,
-    num_domains=NUM_DOMAINS
-    )   
-
-    model.load_state_dict(
-        torch.load(model_path, map_location=device)
-    )
-    model.to(device)
+    model_path = f"models/LLM/models/{model_checkpoint}"
+    
+    print(f"Detected model architecture: {model_checkpoint.split('_', 1)[0]}")
+    if model_checkpoint.split('_', 1)[0] == "BERT":
+        model = BertForSequenceClassification.from_pretrained(model_path)
+    elif model_checkpoint.split('_', 1)[0] == "RoBERTa":
+        model = RobertaForSequenceClassification.from_pretrained(model_path)
+    else:
+        print("ERROR! Model neither BERT nor RoBERTa")
 
     test_data = get_data(cross_domain, balanced, augmented)
 
