@@ -43,8 +43,7 @@ def measure_gpu_memory_and_inference(model_checkpoint: str, device, cross_domain
     
     start_inference = perf_counter()
     test(
-        model_checkpoint=model_checkpoint,
-        logging=False,
+        model_path=model_checkpoint,
         cross_domain=cross_domain,
         balanced=balanced,
         augmented=augmented
