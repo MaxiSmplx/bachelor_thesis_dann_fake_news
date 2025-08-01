@@ -41,6 +41,7 @@ def train(
     cross_domain: bool = True,
     augmented: bool = False,
     balanced: bool = False,
+    disable_domain_head: bool = False
 ) -> str:
     print("\n🚀 Starting training run...")
 
@@ -66,6 +67,7 @@ def train(
                             num_workers=4)
     
     print(f"Loaded Train dataset with {len(train_loader.dataset)} datapoints... \n"
+          f"    • The Domain Classifier is {'disabled' if disable_domain_head else 'enabled'}"
           f"    • Configured batch size: {train_loader.batch_size} => {len(train_loader)} batches per epoch \n"
           f"    • Detected {(no_dom := len(train_loader.dataset.df['domain'].unique()))} domains for training \n"
           f"        • Ideal domain accuracy: {(1/no_dom)*100:.2f}% \n"
@@ -183,12 +185,16 @@ def train(
             iter_num += 1
 
             # forward
-            class_logits, domain_logits = model(x, lambda_p)
+            class_logits, domain_logits = model(x, 0.0 if disable_domain_head else lambda_p)
 
             # compute losses
             loss_class  = class_criterion(class_logits, y_lab)
             loss_domain = domain_criterion(domain_logits, y_dom)
-            loss = loss_class + loss_domain
+
+            if disable_domain_head:
+                loss = loss_class
+            else:
+                loss = loss_class + loss_domain
 
             # backward + step
             optimizer.zero_grad()
@@ -379,6 +385,7 @@ if __name__ == "__main__":
     parser.add_argument("--augmented", action="store_true", help="Use augmented data")
     parser.add_argument("--balanced", action="store_true", help="Use balanced dataset")
     parser.add_argument("--log", action="store_true", help="Enable TensorBoard and logging")
+    parser.add_argument("--disable_domain", action="store_true", help="Disable domain head (NN only)")
 
     args = parser.parse_args()
 
@@ -388,5 +395,6 @@ if __name__ == "__main__":
         cross_domain=args.cross_domain,
         augmented=args.augmented,
         balanced=args.balanced,
-        logging=args.log
+        logging=args.log,
+        disable_domain_head=args.domain,
     )
