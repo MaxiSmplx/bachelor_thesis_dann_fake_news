@@ -61,7 +61,7 @@ def get_dataloader(
     folder_path = os.path.join(f"pipeline/{config['output']}", folder_attribute, folder_name)
 
     if split.lower() in ("train", "tr", "validation", "val"):     
-        data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet").sample(n=200)
+        data = pd.read_parquet(f"{folder_path}/preprocessed_data_train_val.parquet")
 
         if folder_attribute == "cross_domain":
             domains = data['domain'].unique()

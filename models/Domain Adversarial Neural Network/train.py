@@ -67,7 +67,7 @@ def train(
                             num_workers=4)
     
     print(f"Loaded Train dataset with {len(train_loader.dataset)} datapoints... \n"
-          f"    • The Domain Classifier is {'disabled' if disable_domain_head else 'enabled'}"
+          f"    • The Domain Classifier is {'disabled' if disable_domain_head else 'enabled'} \n"
           f"    • Configured batch size: {train_loader.batch_size} => {len(train_loader)} batches per epoch \n"
           f"    • Detected {(no_dom := len(train_loader.dataset.df['domain'].unique()))} domains for training \n"
           f"        • Ideal domain accuracy: {(1/no_dom)*100:.2f}% \n"
