@@ -87,7 +87,8 @@ def run(cross_domain: bool = False, balanced: bool = False, augmented: bool = Fa
     inference_costs = {
         "gpt-4.1-nano-2025-04-14": (0.1, 0.4),
         "gpt-4.1-2025-04-14": (2, 8),
-        "gpt-4o-mini-2024-07-18": (0.15, 0.6)
+        "gpt-4o-mini-2024-07-18": (0.15, 0.6),
+        "gpt-4o-2024-11-20": (2.5, 10)
     }
 
     if not os.path.isdir(f"models/LLM/output/{model}"):

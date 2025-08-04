@@ -396,5 +396,5 @@ if __name__ == "__main__":
         augmented=args.augmented,
         balanced=args.balanced,
         logging=args.log,
-        disable_domain_head=args.domain,
+        disable_domain_head=args.disable_domain,
     )
