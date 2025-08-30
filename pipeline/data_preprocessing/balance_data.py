@@ -30,10 +30,14 @@ def balance_data(df: pd.DataFrame, tolerance: float) -> pd.DataFrame:
     return balanced_df
 
 
-def augmentation_threshold(df: pd.DataFrame, augmentation_budget: int) -> dict:
+def augmentation_threshold(df: pd.DataFrame, augmentation_budget: int, excluded_domains: list[str] = None) -> dict:
     counts = df["domain"].value_counts().to_list()
     names = df["domain"].value_counts().index.tolist()
-    
+    if excluded_domains:
+        filtered = [(name, count) for name, count in zip(names, counts) if name not in excluded_domains]
+        names, counts = zip(*filtered) if filtered else ([], [])
+        print(f"Excluded domains {[domain for domain in df['domain'].value_counts().index.tolist() if domain in excluded_domains]} due to cross domain configuration")
+
     rows_to_augment = [0] * len(counts)
     domain_diff = [(counts[i] - counts[i+1]) for i in range(len(counts) - 1)]
 

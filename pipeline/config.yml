@@ -21,9 +21,9 @@ domain_tagging:
 augmentation:
   # Enable or disable specific augmentation techniques
   style_transfer:
-    enabled: false
+    enabled: true
   paraphrasing:
-    enabled: false
+    enabled: true
 
   # Total number of augmentation requests to send to the OpenAI API per augmentation technique
   # Note: Average cost per 1000 requests is ~$0.18 (based on GPT-4.1 Nano pricing)
@@ -32,10 +32,10 @@ augmentation:
   # Strategy for distributing augmentation across domains
   methods:
     # Augments every domain with an equal number of samples
-    equalized: true
+    equalized: false
 
     # Prioritizes balancing domains with the fewest samples first
-    demand_based: false
+    demand_based: true
 
 
 
@@ -67,7 +67,7 @@ test_set:
   n_domains: 1
 
   use_manual_domains: true
-  manual_domains: ["Government Policy & Public Affairs"]
+  manual_domains: [-1]
 
   # Proportion of the dataset to use as test set
   # Only applicable if test_cross_domains is false
