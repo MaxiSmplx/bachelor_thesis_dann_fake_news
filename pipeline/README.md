@@ -29,9 +29,6 @@ Before preprocessing, the pipeline can optionally enhance the dataset through va
 
 The following augmentation strategies are available:
 
-- **Synonym Replacement**  
-  Randomly replaces selected words in a sentence with their synonyms. This preserves the original meaning while increasing linguistic variety. The method can use either a local synonym database or an LLM-based lookup for greater contextual accuracy.
-
 - **Paraphrasing**  
   Generates alternate versions of input text that express the same meaning using different phrasing. This helps the model learn to generalize across varied sentence structures. Paraphrasing is powered by a large language model (LLM) to ensure fluency and semantic equivalence.
 
@@ -42,7 +39,7 @@ Each augmentation method:
 - Is applied to a **sampled portion** of the dataset (e.g., 10–30% of samples)
 - Produces **new augmented examples**, which are then **appended to the dataset**
 - Can be selectively **enabled or disabled** through the `config.yml` file
-- Supports **LLM-based** augmentation and/or **lightweight local alternatives**
+- Supports **LLM-based** augmentation
 
 📁 **Configurable via**:  
 All augmentation logic — including methods used, percentage of data to augment, and the specific style/tone targets — can be defined in the `augmentation` section of your `config.yml`.
@@ -66,7 +63,7 @@ The entire process is coordinated in `pipeline.py`, which serves as the main ent
 
 ## 💾 Output
 
-All processed data is saved automatically in the `/output` directory.
+All processed data is saved automatically in the output directory specified in `config.yml`.
 
 ---
 
