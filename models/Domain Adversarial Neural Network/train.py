@@ -43,6 +43,39 @@ def train(
     balanced: bool = False,
     disable_domain_head: bool = False
 ) -> str:
+    """Train a Domain Adversarial Neural Network (DANN) model.
+
+    Parameters
+    ----------
+    batch_size : int, default BATCH_SIZE
+        Training batch size.
+    num_epochs : int, default NUM_EPOCHS
+        Number of training epochs.
+    save_dir : str, default CHECKPOINT_DIR
+        Directory where checkpoints are saved.
+    logging : bool, default False
+        If True, logs metrics to file and TensorBoard.
+    cross_domain : bool, default True
+        If True, train in cross-domain setup; else in-domain.
+    augmented : bool, default False
+        Use augmented data if available.
+    balanced : bool, default False
+        Use balanced data if available.
+    disable_domain_head : bool, default False
+        If True, disables the domain classifier head.
+
+    Returns
+    -------
+    str
+        Path to the best model checkpoint saved during training.
+
+    Notes
+    -----
+    - Tracks training/validation losses, accuracy, F1, precision, and recall.
+    - Uses early stopping with patience of 5 epochs.
+    - Saves the best-performing model (by validation accuracy) to `save_dir`.
+    """
+
     print("\n🚀 Starting training run...")
 
     # Device

@@ -14,10 +14,10 @@ import argparse
 from datetime import datetime
 from time import perf_counter
 
-def get_data(cross_domain: bool = False, augmented: bool = False, balanced: bool = False):
+def get_data(cross_domain: bool = False, augmented: bool = False, balanced: bool = False) -> pd.DataFrame:
     return get_dataset("test", cross_domain=cross_domain, augmented=augmented, balanced=balanced)
 
-def prompt_gpt(data: pd.DataFrame, model: str) -> list[dict[str:str]]:
+def prompt_gpt(data: pd.DataFrame, model: str) -> list[dict[str, str]]:
     prompts = [
         {
             "text": row["text"],
@@ -59,7 +59,7 @@ def prompt_gpt(data: pd.DataFrame, model: str) -> list[dict[str:str]]:
     return responses
 
 
-def process_results(responses: list[dict[str:str]], no_samples: int) -> tuple[list[str], list[str]]:
+def process_results(responses: list[dict[str, str]], no_samples: int) -> tuple[list[str], list[str]]:
     y_true = [response["label_original"] for response in responses]
     y_pred = [response["label_predicted"] for response in responses]
 
@@ -77,7 +77,35 @@ def process_results(responses: list[dict[str:str]], no_samples: int) -> tuple[li
     return y_true, y_pred
 
 
-def run(cross_domain: bool = False, balanced: bool = False, augmented: bool = False, no_samples: int = 1000, model: str = "gpt-4.1-nano-2025-04-14"):
+def run(cross_domain: bool = False, balanced: bool = False, augmented: bool = False, no_samples: int = 1000, model: str = "gpt-4.1-nano-2025-04-14") -> None:
+    """Run evaluation with an LLM model on a sampled dataset and log results.
+
+    Parameters
+    ----------
+    cross_domain : bool, default False
+        If True, sample data from cross-domain setup; else in-domain.
+    balanced : bool, default False
+        Use balanced data if available.
+    augmented : bool, default False
+        Use augmented data if available.
+    no_samples : int, default 1000
+        Number of samples to evaluate.
+    model : str, default "gpt-4.1-nano-2025-04-14"
+        Model identifier (must exist in `inference_costs` for cost estimation).
+
+    Returns
+    -------
+    None
+        Prints evaluation metrics, estimated costs (if model is known),
+        and logs results to `models/LLM/output/{model}/training_summary_*.txt`.
+
+    Notes
+    -----
+    - Approximates total inference cost based on average token length and model pricing.
+    - Computes Accuracy, Precision, Recall, and F1 score.
+    - Saves evaluation summary and metrics to disk.
+    """
+
     data_raw = get_data(cross_domain=cross_domain, balanced=balanced, augmented=augmented)
 
     data = data_raw.sample(n=no_samples)

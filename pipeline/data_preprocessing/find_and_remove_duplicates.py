@@ -1,7 +1,7 @@
 import pandas as pd
 import itertools
 
-def print_stats(data: pd.DataFrame) -> None:
+def print_stats(data: pd.DataFrame) -> tuple[int, int]:
     total_rows      = len(data)
     unique_texts    = data['text'].nunique()
     duplicate_rows  = total_rows - unique_texts
@@ -17,7 +17,7 @@ def print_stats(data: pd.DataFrame) -> None:
     return total_rows, unique_texts
 
 
-def duplicates_single(datasets: dict[str: pd.DataFrame]) -> dict[str: pd.DataFrame]:
+def duplicates_single(datasets: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
     print("\n\n==DUPLICATES WITHIN DATASET==")
     total_duplicates_single = 0
 
@@ -34,7 +34,7 @@ def duplicates_single(datasets: dict[str: pd.DataFrame]) -> dict[str: pd.DataFra
     print(f"=> Found {total_duplicates_single} duplicated rows in total")
 
 
-def duplicates_across(datasets: dict[str: pd.DataFrame]) -> dict[str: pd.DataFrame]:
+def duplicates_across(datasets: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
     print("\n\n==DUPLICATES ACROSS DATASETS==")
     text_sets = {name: set(df['text']) for name, df in datasets.items()}
     total_duplicates_across = 0
@@ -51,7 +51,29 @@ def duplicates_across(datasets: dict[str: pd.DataFrame]) -> dict[str: pd.DataFra
     print(f"=> Found {total_duplicates_across} duplicated rows in total")
 
 
-def find_and_remove_dups(data: pd.DataFrame, datasets: dict[str: pd.DataFrame]) -> pd.DataFrame:
+def find_and_remove_dups(data: pd.DataFrame, datasets: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Find and remove duplicate rows within and across multiple datasets.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Combined dataset used for reporting overall duplicate statistics.
+    datasets : dict[str, pd.DataFrame]
+        Dictionary of datasets keyed by name, each containing a "text" column.
+
+    Returns
+    -------
+    pd.DataFrame
+        Concatenated DataFrame of all datasets after duplicate removal.
+
+    Notes
+    -----
+    - Prints dataset statistics (total rows, unique texts, duplicate counts).
+    - Removes duplicates within each dataset (by "text").
+    - Removes duplicates across datasets, dropping overlaps from the first dataset in each pair.
+    - Reports counts and percentages of duplicates removed.
+    """
+
     print_stats(data)
     duplicates_single(datasets)
     duplicates_across(datasets)

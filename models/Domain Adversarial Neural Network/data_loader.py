@@ -46,6 +46,38 @@ def get_dataloader(
     shuffle: bool = True,
     num_workers: int = 4
 ) -> DataLoader:
+    """Load train/validation or test DataLoader(s) from preprocessed parquet files.
+
+    Parameters
+    ----------
+    split : str, default "train"
+        One of {"train", "val", "test"} (aliases allowed). Returns (train, val)
+        loaders for train/val, or a single loader for test.
+    val_fraction : float, default 0.1
+        Fraction of data reserved for validation (by domain if cross_domain=True).
+    cross_domain : bool, default True
+        If True, hold out whole domains for validation; else split within domains.
+    augmented : bool, default False
+        Use augmented data if available.
+    balanced : bool, default False
+        Use balanced data if available.
+    batch_size : int, default BATCH_SIZE
+        DataLoader batch size.
+    shuffle : bool, default True
+        Whether to shuffle batches.
+    num_workers : int, default 4
+        Number of DataLoader workers.
+
+    Returns
+    -------
+    DataLoader or (DataLoader, DataLoader)
+        Test loader if split="test"; otherwise (train_loader, val_loader).
+
+    Raises
+    ------
+    ValueError
+        If `split` is not recognized.
+    """
     with open("pipeline/config.yml", "r") as f:
         config = yaml.safe_load(f)
 

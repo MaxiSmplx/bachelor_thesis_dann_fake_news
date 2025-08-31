@@ -16,6 +16,30 @@ def find_best_model(
         balanced: bool,
         iterations: int
 ):
+    """Train and evaluate multiple models to find the best-performing one.
+
+    Parameters
+    ----------
+    batch_size : int
+        Batch size used during training.
+    epochs : int
+        Number of epochs per training run.
+    cross_domain : bool
+        If True, use cross-domain setup; else in-domain.
+    augmented : bool
+        Use augmented data if available.
+    balanced : bool
+        Use balanced data if available.
+    iterations : int
+        Number of train/test cycles to run.
+
+    Notes
+    -----
+    - Writes logs and results to `models/Domain Adversarial Neural Network/logs/find_best_model/`.
+    - Tracks accuracy, precision, recall, and F1 score.
+    - Reports the highest accuracy achieved across iterations.
+    """
+
     output_folder_path = f"models/Domain Adversarial Neural Network/logs/find_best_model"
     output_file_path = f"{output_folder_path}/{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"
     if not os.path.isdir(output_folder_path):

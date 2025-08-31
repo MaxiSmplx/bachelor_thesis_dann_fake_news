@@ -31,7 +31,7 @@ def sentence_encoding(df: pd.DataFrame, tokenizer_model, save_to_file: bool) -> 
 
     return embeddings
 
-def kMeans(k: int = 13):
+def kMeans(k: int = 13) -> MiniBatchKMeans:
     kmeans = MiniBatchKMeans(
         n_clusters=k,
         batch_size=1024,
@@ -41,7 +41,7 @@ def kMeans(k: int = 13):
 
     return kmeans
 
-def ids_to_topic(samples: dict[int: list[str]]) -> str:
+def ids_to_topic(samples: dict[int, list[str]]) -> dict[str, str]:
     context = (
         "You are an expert at mapping LDA topic keywords to concise, human-readable domain labels. "
         "Input is a Python dict where keys are topic IDs (ints) and values are lists of some examples for that topic. "
@@ -58,7 +58,7 @@ def ids_to_topic(samples: dict[int: list[str]]) -> str:
     return ast.literal_eval(response)
 
 
-def visualize_kmeans(cluster, embeddings, cluster_names, sample_size=5_000):
+def visualize_kmeans(cluster, embeddings, cluster_names, sample_size=5_000) -> None:
     # Randomly sample to increase readability
     if len(embeddings) > sample_size:
         indices = np.random.choice(len(embeddings), size=sample_size, replace=False)
@@ -94,6 +94,35 @@ def add_domain(df: pd.DataFrame,
                save_embeddings: bool = False, 
                use_saved_embeddings: bool = False, 
                plot_kmeans: bool = False) -> pd.DataFrame:
+    """Cluster text data into domains using sentence embeddings and KMeans.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing at least a "text" column.
+    k : int
+        Number of clusters (domains) for KMeans.
+    tokenizer_model : Any
+        Tokenizer or model used for computing sentence embeddings.
+    save_embeddings : bool, default False
+        If True, saves computed embeddings to "output/embeddings.npy".
+    use_saved_embeddings : bool, default False
+        If True, loads embeddings from "output/embeddings.npy" if available.
+    plot_kmeans : bool, default False
+        If True, plots clustered embeddings with domain labels.
+
+    Returns
+    -------
+    pd.DataFrame
+        Input DataFrame with an added "domain" column (mapped to topic names).
+
+    Notes
+    -----
+    - Uses `sentence_encoding` to compute embeddings unless `use_saved_embeddings` is True.
+    - Maps cluster IDs to human-readable topics with `ids_to_topic`.
+    - Optionally visualizes clusters via `visualize_kmeans`.
+    """
+
     if use_saved_embeddings and os.path.exists("output/embeddings.npy"):
         print("Reading saved sentence embeddings...")
         embeddings = np.load("output/embeddings.npy")

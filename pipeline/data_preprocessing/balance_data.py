@@ -1,7 +1,29 @@
 import pandas as pd
-import numpy as np
 
 def balance_data(df: pd.DataFrame, tolerance: float) -> pd.DataFrame:
+    """Balance dataset across domains and labels within a tolerance margin.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame with "domain" and "label" columns.
+    tolerance : float
+        Allowed tolerance factor when setting the balancing cap
+        (cap = min(domain size) * (1 + tolerance)).
+
+    Returns
+    -------
+    pd.DataFrame
+        Balanced DataFrame with reduced domain and label imbalance.
+
+    Notes
+    -----
+    - Caps the number of samples per domain to `cap`.
+    - Within overrepresented domains, samples labels proportionally (≈50/50).
+    - Shuffles and resets index after balancing.
+    - Prints before/after domain and label imbalance statistics.
+    """
+
     cap = int(df["domain"].value_counts().min() * (1 + tolerance))
     print(f"Balancing every domain to approx. {cap} datapoints")
 
@@ -30,7 +52,30 @@ def balance_data(df: pd.DataFrame, tolerance: float) -> pd.DataFrame:
     return balanced_df
 
 
-def augmentation_threshold(df: pd.DataFrame, augmentation_budget: int, excluded_domains: list[str] = None) -> dict:
+def augmentation_threshold(df: pd.DataFrame, augmentation_budget: int, excluded_domains: list[str] = None) -> dict[str, int]:
+    """Calculate how many samples to augment per domain given a budget.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame with a "domain" column.
+    augmentation_budget : int
+        Total number of samples available for augmentation.
+    excluded_domains : list[str], optional
+        Domains to exclude from augmentation (e.g., in cross-domain setups).
+
+    Returns
+    -------
+    dict
+        Mapping of domain name → number of rows to augment.
+
+    Notes
+    -----
+    - Distributes augmentation budget to smaller domains to reduce imbalance.
+    - Excluded domains receive zero augmentation.
+    - Prints which domains were excluded if applicable.
+    """
+
     counts = df["domain"].value_counts().to_list()
     names = df["domain"].value_counts().index.tolist()
     if excluded_domains:

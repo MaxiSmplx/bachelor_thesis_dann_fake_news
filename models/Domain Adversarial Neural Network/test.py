@@ -14,7 +14,33 @@ from config import (
     LOG_DIR
 )
 
-def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True, balanced: bool = False, augmented: bool = True) -> dict[str: float]:
+def test(model_checkpoint: str , logging: bool = True, cross_domain: bool = True, balanced: bool = False, augmented: bool = True) -> dict[str, float]:
+    """Evaluate a trained model checkpoint on the test set.
+
+    Parameters
+    ----------
+    model_checkpoint : str
+        Name of the checkpoint file (without `.pt` extension).
+    logging : bool, default True
+        If True, writes evaluation summary to `LOG_DIR/results/`.
+    cross_domain : bool, default True
+        If True, test on held-out domains; else use all domains.
+    balanced : bool, default False
+        Use balanced data if available.
+    augmented : bool, default True
+        Use augmented data if available.
+
+    Returns
+    -------
+    dict[str, float]
+        Dictionary with metrics: {"Accuracy", "Precision", "Recall", "F1 Score"}.
+
+    Notes
+    -----
+    - Prints progress, batch ETA, and evaluation summary to console.
+    - Also computes domain classification accuracy, though it is not returned.
+    """
+
     print(f"\n🚀 Starting evaluation...\n")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")

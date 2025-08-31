@@ -6,7 +6,36 @@ def get_dataset(split: str =  "train",
     val_fraction: float = 0.1,
     cross_domain: bool = True,
     augmented: bool = False,
-    balanced: bool = False):
+    balanced: bool = False) -> pd.DataFrame:
+    """Load dataset splits (train/validation or test) from preprocessed parquet files.
+
+    Parameters
+    ----------
+    split : str, default "train"
+        One of {"train", "val", "test"} (aliases allowed). Returns (train, val)
+        datasets for train/val, or a single dataset for test.
+    val_fraction : float, default 0.1
+        Fraction of data reserved for validation (by domain if cross_domain=True).
+    cross_domain : bool, default True
+        If True, hold out entire domains for validation; else split within domains.
+    augmented : bool, default False
+        Use augmented data if available.
+    balanced : bool, default False
+        Use balanced data if available.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, pd.DataFrame]
+        (train_dataset, val_dataset) if split is train/val.
+    pd.DataFrame
+        Test dataset if split is "test".
+
+    Raises
+    ------
+    ValueError
+        If `split` is not recognized.
+    """
+
     with open("pipeline/config.yml", "r") as f:
         config = yaml.safe_load(f)
 

@@ -37,7 +37,7 @@ def tokenize_data(train_data: pd.DataFrame, val_data: pd.DataFrame, test_data: p
 
     return (train_dataset, val_dataset, test_dataset)
 
-def compute_metrics(pred):
+def compute_metrics(pred) -> dict[str, float]:
     labels = pred.label_ids
     preds = pred.predictions.argmax(-1)
     return {
@@ -78,7 +78,37 @@ def train(
     cross_domain: bool = True,
     augmented: bool = False,
     balanced: bool = False,
-    model_arch: str = "BERT"):
+    model_arch: str = "BERT") -> None:
+    """
+    Train a BERT or RoBERTa model on domain-specific data.
+
+    Parameters
+    ----------
+    batch_size : int, default 64
+        Training batch size.
+    num_epochs : int, default 10
+        Number of training epochs.
+    cross_domain : bool, default True
+        If True, train in cross-domain setup; else in-domain.
+    augmented : bool, default False
+        Use augmented data if available.
+    balanced : bool, default False
+        Use balanced data if available.
+    model_arch : str, default "BERT"
+        Model architecture, either "BERT" or "RoBERTa".
+
+    Returns
+    -------
+    None
+        Saves training summary, test evaluation metrics, and the trained model.
+
+    Notes
+    -----
+    - Logs training details and metrics to `models/LLM/output/{model_arch}/`.
+    - Saves the trained model in `models/LLM/models/`.
+    - Reports final test accuracy after training.
+    """
+
     if not os.path.isdir(f"models/LLM/output/{model_arch}"):
         os.mkdir(f"models/LLM/output/{model_arch}")
     if not os.path.isdir("models/LLM/models"):

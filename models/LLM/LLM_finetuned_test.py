@@ -28,7 +28,33 @@ def tokenize_data(test_data: pd.DataFrame, model_arch: str) -> TensorDataset:
     return test_dataset
 
 
-def test(model_path: str, cross_domain: bool = True, augmented: bool = False, balanced: bool = False):
+def test(model_path: str, cross_domain: bool = True, augmented: bool = False, balanced: bool = False) -> None:
+    """Evaluate a fine-tuned BERT or RoBERTa model on the test set.
+
+    Parameters
+    ----------
+    model_path : str
+        Name of the saved model checkpoint directory.
+    cross_domain : bool, default True
+        If True, test on held-out domains; else in-domain.
+    augmented : bool, default False
+        Use augmented data if available.
+    balanced : bool, default False
+        Use balanced data if available.
+
+    Returns
+    -------
+    None
+        Prints evaluation metrics and saves results to
+        `models/LLM/output/results/{model_path}`.
+
+    Notes
+    -----
+    - Detects model architecture (BERT or RoBERTa) from the checkpoint name.
+    - Computes Accuracy, Precision, Recall, and F1 score.
+    - Saves evaluation summary to disk.
+    """
+
     print(f"Loading model from: models/LLM/models/{model_path}...")
     if model_path.split('_', 1)[0] == "BERT":
         model = BertForSequenceClassification.from_pretrained(f"models/LLM/models/{model_path}")

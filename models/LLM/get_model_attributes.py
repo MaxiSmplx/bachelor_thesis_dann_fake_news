@@ -8,7 +8,7 @@ from transformers import RobertaForSequenceClassification
 import argparse
 import yaml
 
-def get_data(cross_domain: bool, balanced: bool, augmented: bool):
+def get_data(cross_domain: bool, balanced: bool, augmented: bool) -> pd.DataFrame:
     with open("pipeline/config.yml", "r") as f:
         config = yaml.safe_load(f)
     data_folder_name = {
@@ -21,10 +21,10 @@ def get_data(cross_domain: bool, balanced: bool, augmented: bool):
     data_folder_path = os.path.join(f"pipeline/{config['output']}", data_folder_attribute, data_folder_name)
     return pd.read_parquet(f"{data_folder_path}/preprocessed_data_test.parquet")
 
-def get_param_count(model):
+def get_param_count(model) -> int:
     return sum(p.numel() for p in model.parameters())
 
-def get_model_size(folder_path):
+def get_model_size(folder_path) -> float:
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(folder_path):
         for f in filenames:
@@ -32,13 +32,13 @@ def get_model_size(folder_path):
             total_size += os.path.getsize(fp)
     return total_size / (1024 ** 2)  # MB
 
-def get_model_size_in_ram(model, dtype=torch.float32):
+def get_model_size_in_ram(model, dtype=torch.float32) -> float:
     param_count = get_param_count(model)
     bytes_per_param = torch.tensor([], dtype=dtype).element_size()
     total_size_bytes = param_count * bytes_per_param
     return total_size_bytes / (1024 ** 2) #in MB
 
-def measure_gpu_memory_and_inference(model_checkpoint: str, device, cross_domain: bool, balanced: bool, augmented: bool, test_data: pd.DataFrame):
+def measure_gpu_memory_and_inference(model_checkpoint: str, device, cross_domain: bool, balanced: bool, augmented: bool, test_data: pd.DataFrame) -> dict[str, float]:
     torch.cuda.reset_peak_memory_stats(device)
     
     start_inference = perf_counter()
@@ -58,7 +58,27 @@ def measure_gpu_memory_and_inference(model_checkpoint: str, device, cross_domain
         "inference_per_sample": inference_per_sample
     }
 
-def get_attributes(model_checkpoint: str, cross_domain: bool, augmented: bool, balanced: bool):
+def get_attributes(model_checkpoint: str, cross_domain: bool, augmented: bool, balanced: bool) -> None:
+    """Load a fine-tuned BERT or RoBERTa model checkpoint and report its attributes.
+
+    Parameters
+    ----------
+    model_checkpoint : str
+        Name of the saved model checkpoint directory.
+    cross_domain : bool
+        If True, evaluate using cross-domain data; else in-domain.
+    augmented : bool
+        Use augmented data if available.
+    balanced : bool
+        Use balanced data if available.
+
+    Notes
+    -----
+    - Detects model architecture (BERT or RoBERTa) from the checkpoint name.
+    - Prints parameter count, model size on disk, model size in RAM,
+    peak GPU memory usage, and inference time (total and per sample).
+    """
+
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
     print(f"Using device >> {device}\n")
 
@@ -74,13 +94,15 @@ def get_attributes(model_checkpoint: str, cross_domain: bool, augmented: bool, b
 
     test_data = get_data(cross_domain, balanced, augmented)
 
-
-    print(f"Parameters: {get_param_count(model)}")
-    print(f"Model size: {get_model_size(model_path)} MB")
-    print(f"Model size in RAM: {get_model_size_in_ram(model)} MB")
     inference_dict = measure_gpu_memory_and_inference(model_checkpoint, device, cross_domain, balanced, augmented, test_data)
-    print(f"Peak Memory consumption: {inference_dict['mem_allocation']} MB")
-    print(f"Inference time: total -> {inference_dict['total_inference_time']}, per sample -> {inference_dict['inference_per_sample']}")
+
+    print("\n=== Model Attributes ===")
+    print(f"{'Parameters':<25}: {get_param_count(model):,}")
+    print(f"{'Model size (disk)':<25}: {get_model_size(model_path)} MB")
+    print(f"{'Model size (RAM)':<25}: {get_model_size_in_ram(model)} MB")
+    print(f"{'Peak GPU Memory':<25}: {inference_dict['mem_allocation']} MB")
+    print(f"{'Inference time (total)':<25}: {inference_dict['total_inference_time']}")
+    print(f"{'Inference time (per sample)':<25}: {inference_dict['inference_per_sample']}")
 
 
 if __name__ == "__main__":

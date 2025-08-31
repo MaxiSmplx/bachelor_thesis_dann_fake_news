@@ -61,6 +61,26 @@ def measure_gpu_memory_and_inference(model_checkpoint: str, device, cross_domain
     }
 
 def get_attributes(model_checkpoint: str, cross_domain: bool, augmented: bool, balanced: bool):
+    """Load a trained model checkpoint and report its attributes and performance stats.
+
+    Parameters
+    ----------
+    model_checkpoint : str
+        Name of the saved model checkpoint (without `.pt` extension).
+    cross_domain : bool
+        If True, evaluate using cross-domain data; else in-domain.
+    augmented : bool
+        Use augmented data if available.
+    balanced : bool
+        Use balanced data if available.
+
+    Notes
+    -----
+    - Loads the model onto GPU (CUDA/MPS) if available, else CPU.
+    - Prints parameter count, checkpoint size, in-RAM model size.
+    - Runs inference on test data to measure peak GPU memory usage and inference time.
+    """
+
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.mps.is_available() else "cpu")
     print(f"Using device >> {device}\n")
 
@@ -81,14 +101,15 @@ def get_attributes(model_checkpoint: str, cross_domain: bool, augmented: bool, b
 
     test_data = get_data(cross_domain, balanced, augmented)
 
-
-    print(f"Parameters: {get_param_count(model)}")
-    print(f"Model size: {get_model_size(model_path)} MB")
-    print(f"Model size in RAM: {get_model_size_in_ram(model)} MB")
     inference_dict = measure_gpu_memory_and_inference(model_checkpoint, device, cross_domain, balanced, augmented, test_data)
-    print(f"Peak Memory consumption: {inference_dict['mem_allocation']} MB")
-    print(f"Inference time: total -> {inference_dict['total_inference_time']}, per sample -> {inference_dict['inference_per_sample']}")
 
+    print("\n=== Model Attributes ===")
+    print(f"{'Parameters':<25}: {get_param_count(model):,}")
+    print(f"{'Model size (disk)':<25}: {get_model_size(model_path)} MB")
+    print(f"{'Model size (RAM)':<25}: {get_model_size_in_ram(model)} MB")
+    print(f"{'Peak GPU Memory':<25}: {inference_dict['mem_allocation']} MB")
+    print(f"{'Inference time (total)':<25}: {inference_dict['total_inference_time']}")
+    print(f"{'Inference time (per sample)':<25}: {inference_dict['inference_per_sample']}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Find best DANN model")
