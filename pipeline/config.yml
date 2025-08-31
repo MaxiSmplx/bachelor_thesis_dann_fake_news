@@ -73,6 +73,5 @@ test_set:
   # Only applicable if test_cross_domains is false
   test_size: 0.1
 
-
 # Directory for saving processed data
 output: "output" 

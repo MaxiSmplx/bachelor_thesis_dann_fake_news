@@ -17,14 +17,14 @@ def get_files() -> None:
     with open("config.yml", "r") as f:
         config = yaml.safe_load(f)
 
-    for folder_name, type_dict in GOOGLE_DRIVE_FINAL_IDS.items():
-        print(f"\n📦 Downloading Folder {folder_name}")
-        if not os.path.isdir(f"{config['output']}/{folder_name}"):
-            os.mkdir(f"{config['output']}/{folder_name}")
-        for type, id in type_dict.items():
-            print(f"\n📁 Downloading Dataset -> {type}")
-            download_drive_file(id, f"pipeline/{config['output']}/{folder_name}/{type}.parquet")
-
+    for domain_type, domain_content in GOOGLE_DRIVE_FINAL_IDS.items():
+        for preprocessed_type, content_ids in domain_content.items():
+            print(f"\n📦 Downloading Folder {domain_type}/{preprocessed_type}")
+            if not os.path.isdir(f"{config['output']}/{domain_type}/{preprocessed_type}"):
+                os.mkdir(f"{config['output']}/{domain_type}/{preprocessed_type}")
+            for dataset_type, id in content_ids.items():
+                print(f"\n📁 Downloading Dataset -> {dataset_type}")
+                download_drive_file(id, f"{config['output']}/{domain_type}/{preprocessed_type}/{dataset_type}.parquet")
 
 if __name__ == "__main__":
     """Download all pipeline output files from Google Drive."""

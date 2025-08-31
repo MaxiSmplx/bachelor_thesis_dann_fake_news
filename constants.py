@@ -80,20 +80,28 @@ GOOGLE_DRIVE_IDS = {
 
 # Google Drive IDs for final processed and augmented dataset
 GOOGLE_DRIVE_FINAL_IDS = {
-    "raw": {
-        "train_val": "",
-        "test": "",
-    }, 
-    "balanced": {
-        "train_val": "",
-        "test": "",
+    "cross_domain": {
+        "raw": {
+            "preprocessed_data_train_val": "1IJgWH6VHckklXW6QjFGjgqSZ-OYwmr7G",
+            "preprocessed_data_test": "1P_vo19ZBwAMkCWU3woNiCCS9vdjPhSHP",
+        }, 
+        "balanced": {
+            "preprocessed_data_train_val": "1qpFmNOvATVkqSLRV5CBSyZcM-qmEC7Sd",
+            "preprocessed_data_test": "18LjGz9_3Ua6sl-Hunp3Nay1UszGYsW8L",
+        },
+        "augmented": {
+            "preprocessed_data_train_val": "1PAgUN7QnO2MJwot3ixFIqfA83rbXjpRW",
+            "preprocessed_data_test": "11jXprf1JZzpwPtL36ESKU3ahRrqcGPMp",
+        },
+        "balanced_augmented": {
+            "preprocessed_data_train_val": "1eVC90hiBnmwwNhKxdgTSKIrLEnVkE85T",
+            "preprocessed_data_test": "1ABxLkMHAIgr9mTJ9kTPgLEaUgWYEXi6p",
+        }, 
     },
-    "augmented": {
-        "train_val": "",
-        "test": "",
-    },
-    "balanced_augmented": {
-        "train_val": "",
-        "test": "",
-    }, 
+    "in_domain": {
+        "raw": {
+            "preprocessed_data_train_val": "18gMqhjx4ual3xANxJY_1uzjOSU6ULvDG",
+            "preprocessed_data_test": "1EazWVhNq-S6k0AmbPA4gvn266zRfOgg3"
+        }
+    }
 }
